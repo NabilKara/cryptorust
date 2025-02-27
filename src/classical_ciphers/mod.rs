@@ -3,3 +3,4 @@ pub mod vigenere;
 pub mod rail_fence;
 mod test;
 mod one_time_pad;
+mod random_substitution;
