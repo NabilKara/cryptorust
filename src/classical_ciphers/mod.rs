@@ -4,3 +4,5 @@ pub mod rail_fence;
 mod test;
 mod one_time_pad;
 mod random_substitution;
+pub mod frequency_analysis;
+pub mod index_of_coincidence;
