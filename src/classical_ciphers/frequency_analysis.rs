@@ -1,5 +1,4 @@
 use std::collections::HashMap;
-use crate::classical_ciphers::index_of_coincidence::index_of_coincidence_counter;
 
 pub fn frequency_counter(ciphertext: &str) -> HashMap<char, usize> {
     let mut freq_table = HashMap::new();
@@ -12,4 +11,14 @@ pub fn frequency_counter(ciphertext: &str) -> HashMap<char, usize> {
         }
     }
     freq_table
+}
+
+fn printMenu(){
+    println!("in frequency_analysis");
+}
+
+pub fn Menu(PATH: &mut String) -> u8 {
+    PATH.push_str("frequency_analysis/");
+    printMenu();
+    return 1;
 }

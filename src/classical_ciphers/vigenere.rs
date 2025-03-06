@@ -46,3 +46,12 @@ pub fn decrypt_vigenere(ciphertext: &str, key: &str) -> String {
         })
         .collect()
 }
+
+fn printMenu(){
+    println!("in vigenere");
+}
+
+pub fn Menu(PATH: &mut String) -> u8 {
+    PATH.push_str("vigenere/");
+    return 1;
+}
