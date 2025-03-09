@@ -8,5 +8,5 @@ mod random_substitution;
 pub mod frequency_analysis;
 pub mod index_of_coincidence;
 pub mod menu;
-
+pub mod playfair;
 pub use crate::menu::getInput;
