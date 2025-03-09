@@ -1,9 +1,11 @@
 use crate::classical_ciphers::frequency_analysis::frequency_counter;
 
 pub fn index_of_coincidence_counter(ciphertext: &str) -> f64 {
-    let filtered_text: String = ciphertext.chars()
+    let mut filtered_text: String = ciphertext.chars()
         .filter(|c| c.is_alphabetic())
-        .collect();
+        .collect::<String>()
+        .to_ascii_lowercase();
+
     let freq = frequency_counter(&filtered_text);
     let ciphertext_len = filtered_text.len();
     if ciphertext_len < 2 {
