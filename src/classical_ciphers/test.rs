@@ -1,5 +1,6 @@
 #[cfg(test)]
 mod tests {
+    use crate::classical_ciphers::affine_cipher::{decrypt_affine, encrypt_affine};
     use crate::classical_ciphers::caesar::{decrypt_caesar, encrypt_caesar};
     use crate::classical_ciphers::frequency_analysis::{decrypt_using_freq_analysis, frequency_counter};
     use crate::classical_ciphers::one_time_pad::{decrypt_otp, encrypt_otp};
@@ -70,14 +71,18 @@ mod tests {
 
         let mut found = false;
         for decryption in possible_decryptions {
-            println!("decryption: {:?}", decryption);
-            println!("Expected: {:?}", expected_plaintext);
             if decryption.eq_ignore_ascii_case(expected_plaintext) {
-                println!("Found decryption: {:?}", decryption);
                 found = true;
                 break;
             }
         }
         assert!(found, "The expected plaintext was not found in the possible decryptions.");
+    }
+    #[test]
+    fn test_affine_cipher(){
+        let plaintext = "INFO ING 3 SEC";
+        let a: u8 =  5;
+        let b : u8 = 6;
+        assert_eq!(plaintext, decrypt_affine(&*encrypt_affine(plaintext, a, b), a, b));
     }
 }
