@@ -10,3 +10,5 @@ pub mod frequency_analysis;
 pub mod index_of_coincidence;
 mod Kasiski_Test;
 mod affine_cipher;
+mod playfair;
+mod menu;

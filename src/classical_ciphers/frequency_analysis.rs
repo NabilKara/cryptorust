@@ -28,8 +28,8 @@ fn printMenu(){
 pub fn Menu(PATH: &mut String) -> u8 {
     PATH.push_str("frequency_analysis/");
     printMenu();
-    return 1;
-  
+    1
+}
 pub fn decrypt_using_freq_analysis(ciphertext: &str) -> Vec<String> {
     let cleaned_ciphertext: String = ciphertext.chars()
         .filter(|c| c.is_alphabetic())
