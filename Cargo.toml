@@ -4,4 +4,6 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+modinverse = "0.1.1"
+num = "0.4.3"
 rand = "0.9.0"

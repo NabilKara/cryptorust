@@ -1,14 +1,20 @@
+
 #![allow(nonstandard_style)]
 #![allow(dead_code)]
 
 use std::process::exit;
+
+use crate::classical_ciphers::caesar::encrypt_caesar;
+use crate::classical_ciphers::frequency_analysis::{decrypt_using_freq_analysis};
+use crate::classical_ciphers::index_of_coincidence::index_of_coincidence_counter;
+
 
 mod classical_ciphers;
 mod menu;
 
 fn printMenu(){
     println!("PLease choose an option:");
-    println!("1- Cyphers");
+    println!("1- Ciphers");
     println!("2- Encryption Systems");
     println!("3- Help");
     println!("4- Quit");
