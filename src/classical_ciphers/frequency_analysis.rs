@@ -1,5 +1,7 @@
 use std::collections::HashMap;
+
 use crate::classical_ciphers::caesar::decrypt_caesar;
+
 
 pub const COMMON_ENGLISH_LETTERS: [char; 26] = [
     'E', 'T', 'A', 'O', 'I', 'N', 'S', 'H', 'R', 'D', 'L', 'C', 'U', 'M', 'W', 'F', 'G', 'Y', 'P', 'B', 'V', 'K', 'J', 'X', 'Q', 'Z',
@@ -18,6 +20,16 @@ pub fn frequency_counter(ciphertext: &str) -> HashMap<char, usize> {
     freq_table
 }
 
+
+fn printMenu(){
+    println!("in frequency_analysis");
+}
+
+pub fn Menu(PATH: &mut String) -> u8 {
+    PATH.push_str("frequency_analysis/");
+    printMenu();
+    return 1;
+  
 pub fn decrypt_using_freq_analysis(ciphertext: &str) -> Vec<String> {
     let cleaned_ciphertext: String = ciphertext.chars()
         .filter(|c| c.is_alphabetic())
