@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+#![allow(nonstandard_style)]
 pub mod caesar;
 pub mod vigenere;
 pub mod rail_fence;

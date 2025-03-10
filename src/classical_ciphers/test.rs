@@ -7,6 +7,8 @@ mod tests {
     use crate::classical_ciphers::random_substitution::{decrypt_random_substitution, encrypt_random_substitution, generate_random_substitution_key};
     use crate::classical_ciphers::vigenere::{decrypt_vigenere, encrypt_vigenere};
     use crate::classical_ciphers::index_of_coincidence::index_of_coincidence_counter;
+    use crate::classical_ciphers::rail_fence;
+
     #[test]
     fn test_caesar_cipher() {
         assert_eq!(encrypt_caesar("HELLO", 3), "KHOOR");
@@ -84,5 +86,18 @@ mod tests {
         let a: u8 =  5;
         let b : u8 = 6;
         assert_eq!(plaintext, decrypt_affine(&*encrypt_affine(plaintext, a, b), a, b));
+    }
+
+    #[test]
+    fn test_rail_fence_cipher() {
+        // Encryption
+        assert_eq!(rail_fence::encrypt("HELLO", 2), "HLOEL");
+        assert_eq!(rail_fence::encrypt("HELLOWORLD", 3), "HOLELWRDLO");
+        assert_eq!(rail_fence::encrypt("RAILFENCE", 4), "RNAECIFEL");
+
+        // Decryption
+        assert_eq!(rail_fence::decrypt("IFIGNON", 2), "INFOING");
+        assert_eq!(rail_fence::decrypt("HOELMMLO", 3), "HELLOMOM");
+        assert_eq!(rail_fence::decrypt("REACCINIRLEPEFH", 5), "RAILFENCECIPHER");
     }
 }

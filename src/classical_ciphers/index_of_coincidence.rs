@@ -1,7 +1,7 @@
 use crate::classical_ciphers::frequency_analysis::frequency_counter;
 
 pub fn index_of_coincidence_counter(ciphertext: &str) -> f64 {
-    let mut filtered_text: String = ciphertext.chars()
+    let filtered_text: String = ciphertext.chars()
         .filter(|c| c.is_alphabetic())
         .collect::<String>()
         .to_ascii_lowercase();
