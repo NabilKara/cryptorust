@@ -6,6 +6,7 @@ mod tests {
     use crate::classical_ciphers::one_time_pad::{decrypt_otp, encrypt_otp};
     use crate::classical_ciphers::random_substitution::{decrypt_random_substitution, encrypt_random_substitution, generate_random_substitution_key};
     use crate::classical_ciphers::vigenere::{decrypt_vigenere, encrypt_vigenere};
+    use crate::classical_ciphers::playfair::{decrypt_playfair, encrypt_playfair};
     use crate::classical_ciphers::index_of_coincidence::index_of_coincidence_counter;
     #[test]
     fn test_caesar_cipher() {
@@ -49,6 +50,17 @@ mod tests {
         assert_eq!(freq_map[&'X'], 0);
         assert_eq!(freq_map[&'Z'], 0);
     }
+    #[test]
+    fn test_playfair_cipher() {
+        let key = "GHedwa";
+        let plaintext = "Cipher";
+        let ciphertext = encrypt_playfair(plaintext, key);
+        let decrypted = decrypt_playfair(&ciphertext, key);
+
+       assert_eq!(encrypt_playfair("cryptographie", "ghedwa"), "MXUSZTEPKUWBCE");
+       assert_eq!(decrypt_playfair("MXUSZTEPKUWBCE", "ghedwa"), "CRYPTOGRAPHIEX");
+    }
+
     #[test]
     fn test_index_of_coincidence_counter() {
         let ciphertext = "AABBCCDDEEFFGGHHIIJJKKLLMMNNOOPPQQRRSSTTUUVVWWXXYYZZ";
