@@ -13,8 +13,8 @@ fn printMenu(){
 }
 
 fn main() {
+    print!("{esc}[2J{esc}[1;1H", esc = 27 as char);
     loop {
-        print!("{esc}[2J{esc}[1;1H", esc = 27 as char);
 
         let mut PATH = String::from("/");
         printMenu();

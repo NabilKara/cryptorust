@@ -70,7 +70,6 @@ mod tests {
         // Calculate the IoC
         let ioc = index_of_coincidence_counter(ciphertext);
 
-
         let expected_ioc = 52.0 / (52.0 * 51.0);
 
         assert!((ioc - expected_ioc).abs() < 1e-10, "Index of Coincidence calculation is incorrect");

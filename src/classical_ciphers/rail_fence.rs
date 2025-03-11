@@ -115,7 +115,10 @@ pub fn Menu(PATH: &mut String) -> u8 {
 
     PATH.push_str(PREFIX);
     r = super::getGenericOption(PATH.clone());
-    if r == 3 { return 1; }
+    if r == 3 {
+        PATH.drain(PATH.len() - PREFIX.len()..);
+        return 1;
+    }
 
     print!("Enter text: ");               io::stdout().flush().unwrap();
     io::stdin().read_line(&mut buf).expect("Failed to read plaintext.");

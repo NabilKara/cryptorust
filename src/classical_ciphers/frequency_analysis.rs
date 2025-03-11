@@ -1,7 +1,7 @@
 use std::collections::HashMap;
-
+use std::io;
+use std::io::Write;
 use crate::classical_ciphers::caesar::decrypt_caesar;
-
 
 pub const COMMON_ENGLISH_LETTERS: [char; 26] = [
     'E', 'T', 'A', 'O', 'I', 'N', 'S', 'H', 'R', 'D', 'L', 'C', 'U', 'M', 'W', 'F', 'G', 'Y', 'P', 'B', 'V', 'K', 'J', 'X', 'Q', 'Z',
@@ -20,16 +20,6 @@ pub fn frequency_counter(ciphertext: &str) -> HashMap<char, usize> {
     freq_table
 }
 
-
-fn printMenu(){
-    println!("in frequency_analysis");
-}
-
-pub fn Menu(PATH: &mut String) -> u8 {
-    PATH.push_str("frequency_analysis/");
-    printMenu();
-    1
-}
 pub fn decrypt_using_freq_analysis(ciphertext: &str) -> Vec<String> {
     let cleaned_ciphertext: String = ciphertext.chars()
         .filter(|c| c.is_alphabetic())
@@ -45,15 +35,51 @@ pub fn decrypt_using_freq_analysis(ciphertext: &str) -> Vec<String> {
 
     let most_freq_english_char = 'E';
     let mut possible_decryptions = Vec::new();
-    println!("most freq chars : {:?}", most_freq_chars);
+    // println!("most freq chars : {:?}", most_freq_chars);
     for &most_freq_ciphertext_char in &most_freq_chars {
         let shift = (most_freq_ciphertext_char as u8).wrapping_sub(most_freq_english_char as u8) % 26;
-        println!(
-            "Trying {} -> {} (shift: {})",
-            most_freq_ciphertext_char, most_freq_english_char, shift
-        );
+        // println!(
+        //     "Trying {} -> {} (shift: {})",
+        //     most_freq_ciphertext_char, most_freq_english_char, shift
+        // );
         let decryption = decrypt_caesar(ciphertext, shift);
         possible_decryptions.push(decryption);
     }
     possible_decryptions
+}
+
+fn printMenu(){
+    println!("What do you want to do?");
+    println!("1- Decrypt");
+    println!("2- Return");
+}
+
+fn getOption(PATH: String) -> u8 {
+    printMenu();
+    let r = super::getInput(PATH, 1, 2);
+    println!();
+    r
+}
+
+pub fn Menu(PATH: &mut String) -> u8 {
+    let mut buf = String::new();
+    let decryptions;
+    const PREFIX: &str = "frequency_analysis/";
+
+    PATH.push_str(PREFIX);
+    let r = getOption(PATH.clone());
+    if r == 2 {
+        PATH.drain(PATH.len() - PREFIX.len()..);
+        return 1;
+    }
+
+    print!("Enter text: ");                 io::stdout().flush().unwrap();
+    io::stdin().read_line(&mut buf).expect("Failed to read plaintext");
+
+    decryptions = decrypt_using_freq_analysis(&buf);
+
+    println!("\nPossible Decryptions:");
+    for i in 0..decryptions.len() { println!("{}: {}", i + 1, decryptions[i]); }
+    PATH.drain(PATH.len() - PREFIX.len()..);
+    0
 }
