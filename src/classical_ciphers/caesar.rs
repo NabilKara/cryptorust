@@ -19,32 +19,22 @@ pub fn decrypt_caesar(plaintext: &str,shift: u8) -> String {
     encrypt_caesar(plaintext, ALPHABET_SIZE - (shift % ALPHABET_SIZE))
 }
 
-fn printMenu(){
-    println!("What do you want to do?");
-    println!("1- Encrypt");
-    println!("2- Decrypt");
-    println!("3- Return");
-}
-
 pub fn Menu(PATH: &mut String) -> u8 {
     let mut buf = String::new();
     let mut shift = String::new();
+    let r;
+    const PREFIX: &str = "caesar/";
 
-    PATH.push_str("caesar_cipher/");
-    printMenu();
-    let r = super::getInput(PATH.clone(), 1, 3);
-    print!("{esc}[2J{esc}[1;1H", esc = 27 as char);
-    match r {
-        3 => return 1,
-        _ => {}
-    }
+    PATH.push_str(PREFIX);
+    r = super::getGenericOption(PATH.clone());
+    if r == 3 { return 1; }
 
     print!("Enter text: ");               io::stdout().flush().unwrap();
-    io::stdin().read_line(&mut buf).unwrap();
+    io::stdin().read_line(&mut buf).expect("Failed to read plaintext");
 
-    print!("Enter size of shift:");       io::stdout().flush().unwrap();
-    io::stdin().read_line(&mut shift).unwrap();
-    let shift = shift.trim().parse::<u8>().unwrap();
+    print!("Enter size of shift: ");      io::stdout().flush().unwrap();
+    io::stdin().read_line(&mut shift).expect("Failed to read shift size");
+    let shift = shift.trim().parse::<u8>().expect("Invalid shift number");
 
     match r {
         1 => buf = encrypt_caesar(buf.as_str(), shift),
@@ -53,5 +43,6 @@ pub fn Menu(PATH: &mut String) -> u8 {
     }
 
     println!("\nResult: {buf}");
-    return 0;
+    PATH.drain(PATH.len() - PREFIX.len()..);
+    0
 }

@@ -1,5 +1,20 @@
+#![allow(nonstandard_style)]
 use std::io;
 use std::io::Write;
+
+pub fn printGenericMenu(){
+    println!("What do you want to do?");
+    println!("1- Encrypt");
+    println!("2- Decrypt");
+    println!("3- Return");
+}
+
+pub fn getGenericOption(PATH: String) -> u8 {
+    printGenericMenu();
+    let r = getInput(PATH, 1, 3);
+    println!();
+    r
+}
 
 pub fn getInput(PATH: String, minVal: u8, maxVal: u8) -> u8 {
     loop {

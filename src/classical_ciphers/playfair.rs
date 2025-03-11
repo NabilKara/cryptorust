@@ -1,4 +1,5 @@
 use std::io;
+use std::io::Write;
 
 const ALPHABET: &str = "ABCDEFGHIKLMNOPQRSTUVWXYZ"; // 'J' is merged with 'I'
 
@@ -164,7 +165,7 @@ fn display_matrix(matrix: &[[char; 5]; 5]) {
     }
 }
 
-fn main() {
+pub fn main() {
     let mut key = String::new();
     let mut plaintext = String::new();
 
@@ -185,4 +186,33 @@ fn main() {
     println!("\nOriginal: {}", plaintext);
     println!("Encrypted: {}", ciphertext);
     println!("Decrypted: {}", decrypted);
+}
+
+pub fn Menu(PATH: &mut String) -> u8 {
+    let mut buf = String::new();
+    let mut key = String::new();
+    let r;
+    const PREFIX: &str = "playfair/";
+
+    PATH.push_str(PREFIX);
+    r = super::getGenericOption(PATH.clone());
+    if r == 1 { return 1; }
+
+    print!("Enter text: ");                 io::stdout().flush().unwrap();
+    io::stdin().read_line(&mut buf).expect("Failed to read plaintext");
+    buf = buf.trim().to_string();
+
+    print!("Enter key: ");                  io::stdout().flush().unwrap();
+    io::stdin().read_line(&mut key).expect("Failed to read key");
+    key = key.trim().to_string();
+
+    match r {
+        1 => buf = encrypt_playfair(buf.as_str(), key.as_str()),
+        2 => buf = decrypt_playfair(buf.as_str(), key.as_str()),
+        _ => {}
+    }
+
+    println!("\nResult: {buf}");
+    PATH.drain(PATH.len() - PREFIX.len()..);
+    0
 }

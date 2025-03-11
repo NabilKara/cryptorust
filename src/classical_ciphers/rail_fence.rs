@@ -1,3 +1,7 @@
+use std::io;
+use std::io::Write;
+
+// Not used but can be useful later
 fn print_matrix(matrix: Vec<Vec<char>>){
     for i in 0..matrix.len() {
         for j in 0..matrix[i].len() {
@@ -101,4 +105,32 @@ pub fn decrypt(text: &str, rails: u8) -> String {
     }
 
     result
+}
+
+pub fn Menu(PATH: &mut String) -> u8 {
+    let mut buf = String::new();
+    let mut rails = String::new();
+    let r;
+    const PREFIX: &str = "rail_fence/";
+
+    PATH.push_str(PREFIX);
+    r = super::getGenericOption(PATH.clone());
+    if r == 3 { return 1; }
+
+    print!("Enter text: ");               io::stdout().flush().unwrap();
+    io::stdin().read_line(&mut buf).expect("Failed to read plaintext.");
+
+    print!("Enter number of rails: ");      io::stdout().flush().unwrap();
+    io::stdin().read_line(&mut rails).expect("Failed to read number of rails.");
+    let rails = rails.trim().parse::<u8>().expect("Invalid rails number.");
+
+    match r {
+        1 => buf = encrypt(buf.as_str(), rails),
+        2 => buf = decrypt(buf.as_str(), rails),
+        _ => {}
+    }
+
+    println!("\nResult: {buf}");
+    PATH.drain(PATH.len() - PREFIX.len()..);
+    0
 }
