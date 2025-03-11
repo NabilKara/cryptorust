@@ -9,6 +9,7 @@ mod tests {
     use crate::classical_ciphers::playfair::{decrypt_playfair, encrypt_playfair};
     use crate::classical_ciphers::index_of_coincidence::index_of_coincidence_counter;
     use crate::classical_ciphers::rail_fence;
+    use crate::classical_ciphers::Kasiski_Test::{gcd, gcd_list, find_repeated_sequences, kasiski_examination};
 
     #[test]
     fn test_caesar_cipher() {
@@ -111,4 +112,58 @@ mod tests {
         assert_eq!(rail_fence::decrypt("HOELMMLO", 3), "HELLOMOM");
         assert_eq!(rail_fence::decrypt("REACCINIRLEPEFH", 5), "RAILFENCECIPHER");
     }
+
+    #[test]
+    fn test_gcd() {
+        assert_eq!(gcd(24, 36), 12);
+        assert_eq!(gcd(101, 103), 1); // Prime numbers
+        assert_eq!(gcd(48, 18), 6);
+        assert_eq!(gcd(5, 0), 5); // Edge case
+    }
+
+    #[test]
+    fn test_gcd_list() {
+        let numbers = vec![24, 36, 48];
+        assert_eq!(gcd_list(&numbers), 12);
+        
+        let numbers = vec![10, 20, 30];
+        assert_eq!(gcd_list(&numbers), 10);
+        
+        let numbers = vec![7, 11, 13];
+        assert_eq!(gcd_list(&numbers), 1);
+
+        let empty_vec: Vec<usize> = vec![];
+        assert_eq!(gcd_list(&empty_vec), 1); // Should return 1 for empty list
+    }
+
+    #[test]
+    fn test_find_repeated_sequences() {
+        let ciphertext = "ABCDABCDABCD"; // "ABCD" repeats every 4 characters
+        let distances = find_repeated_sequences(ciphertext, 4);
+        assert_eq!(distances, vec![4, 4, 4 , 4, 4]); // Expecting distances of 4
+
+    }
+
+    #[test]
+    fn test_kasiski_examination() {
+        let ciphertext = "ABCXYZABCXYZABCXYZABCXYZ"; // "ABCXYZ"
+        let estimated_key_length = kasiski_examination(ciphertext);
+        assert_eq!(estimated_key_length, Some(6));
+    }
+
+
+    #[test]
+    fn test_kasiski_no_repeats() {
+        let ciphertext = "ABCDEFGHIJKLMNO"; // No repetitions
+        let estimated_key_length = kasiski_examination(ciphertext);
+        assert_eq!(estimated_key_length, None);
+    }
+
+    #[test]
+    fn test_kasiski_short_text() {
+        let ciphertext = "ABC"; // Too short for trigram analysis
+        let estimated_key_length = kasiski_examination(ciphertext);
+        assert_eq!(estimated_key_length, None);
+    }
+
 }
