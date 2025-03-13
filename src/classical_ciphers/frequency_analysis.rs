@@ -6,6 +6,10 @@ use crate::classical_ciphers::caesar::decrypt_caesar;
 pub const COMMON_ENGLISH_LETTERS: [char; 26] = [
     'E', 'T', 'A', 'O', 'I', 'N', 'S', 'H', 'R', 'D', 'L', 'C', 'U', 'M', 'W', 'F', 'G', 'Y', 'P', 'B', 'V', 'K', 'J', 'X', 'Q', 'Z',
 ];
+pub const COMMON_FRENCH_LETTERS: [char; 26] = [
+    'E', 'A', 'S', 'I', 'T', 'N', 'R', 'U', 'L', 'O', 'D', 'C', 'M', 'P', 'V', 'Q', 'F', 'B', 'G', 'H', 'J', 'X', 'Y', 'Z', 'K', 'W',
+];
+
 pub fn frequency_counter(ciphertext: &str) -> HashMap<char, usize> {
     let cleaned_ciphertext =  ciphertext.to_ascii_uppercase();
     let mut freq_table = HashMap::new();
@@ -33,7 +37,7 @@ pub fn decrypt_using_freq_analysis(ciphertext: &str) -> Vec<String> {
         .map(|(&c, _)| c)
         .collect();
 
-    let most_freq_english_char = 'E';
+    let most_freq_char = 'E';
     let mut possible_decryptions = Vec::new();
     // println!("most freq chars : {:?}", most_freq_chars);
     for &most_freq_ciphertext_char in &most_freq_chars {
