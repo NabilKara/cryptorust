@@ -41,7 +41,7 @@ pub fn decrypt_using_freq_analysis(ciphertext: &str) -> Vec<String> {
     let mut possible_decryptions = Vec::new();
     // println!("most freq chars : {:?}", most_freq_chars);
     for &most_freq_ciphertext_char in &most_freq_chars {
-        let shift = (most_freq_ciphertext_char as u8).wrapping_sub(most_freq_english_char as u8) % 26;
+        let shift = (most_freq_ciphertext_char as u8).wrapping_sub(most_freq_char as u8) % 26;
         // println!(
         //     "Trying {} -> {} (shift: {})",
         //     most_freq_ciphertext_char, most_freq_english_char, shift
