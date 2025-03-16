@@ -3,6 +3,7 @@
 
 mod classical_ciphers;
 mod menu;
+mod symmetric_encryption;
 
 fn printMenu(){
     println!("PLease choose an option:");
