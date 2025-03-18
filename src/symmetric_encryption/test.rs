@@ -1,6 +1,9 @@
 #[cfg(test)]
 mod tests {
-    use crate::symmetric_encryption::aes::{sub_bytes, shift_rows, mix_columns,encrypt_block};
+    use aes::Aes128;
+    use aes::cipher::{Block, BlockEncrypt, KeyInit};
+    use crate::symmetric_encryption::aes_decryption::decrypt_block;
+    use crate::symmetric_encryption::aes_encryption::{sub_bytes, shift_rows, mix_columns, encrypt_block, encrypt_ecb};
     #[test]
     fn test_sub_bytes() {
         let mut state: [u8; 16] = [
@@ -85,4 +88,42 @@ mod tests {
         encrypt_block(&state, &mut output, &key);
         assert_eq!(expected_state, output);
     }
+    #[test]
+    fn test_decrypt_block(){
+        let state: [u8; 16] = [
+            0x69, 0xc4, 0xe0, 0xd8,
+            0x6a, 0x7b, 0x04, 0x30,
+            0xd8, 0xcd, 0xb7, 0x80,
+            0x70, 0xb4, 0xc5, 0x5a,
+        ];
+        let expected_state: [u8; 16] = [
+            0x00, 0x11, 0x22, 0x33,
+            0x44, 0x55, 0x66, 0x77,
+            0x88, 0x99, 0xaa, 0xbb,
+            0xcc, 0xdd, 0xee, 0xff,
+        ];
+        let key: [u8; 16] = [
+            0x00, 0x01, 0x02, 0x03,
+            0x04, 0x05, 0x06, 0x07,
+            0x08, 0x09, 0x0a, 0x0b,
+            0x0c, 0x0d, 0x0e, 0x0f,
+        ];
+        let mut output = [0u8; 16];
+        decrypt_block(&state, &mut output, &key);
+        assert_eq!(expected_state, output);
+    }
+    // #[test]
+    // fn test_encrypt_ecb() {
+    //     let key = b"0123456789abcdef";
+    //     let plaintext = b"Hello, AES-ECB!";
+    //
+    //     let ciphertext = encrypt_ecb(plaintext.to_vec(), key);
+    //
+    //     let expected_ciphertext = vec![
+    //         0x66, 0x99, 0x7c, 0x10, 0x79, 0x7c, 0x63, 0x99,
+    //         0xef, 0x3a, 0x97, 0x45, 0xf1, 0xe2, 0x92, 0xf5
+    //     ];
+    //
+    //     assert_eq!(ciphertext, expected_ciphertext, "AES-ECB encryption failed!");
+    // }
 }
