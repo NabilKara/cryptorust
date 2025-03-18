@@ -196,4 +196,22 @@ mod tests {
         }
 
     }
+    #[test]
+    fn test_encrypt_ecb() {
+        // Known plaintext, key, and expected ciphertext
+        let plaintext = b"Hello, world!12"; // 15 bytes
+        let key = b"0123456789abcdef"; // 16 bytes
+
+        // Expected ciphertext in hexadecimal format
+        let expected_ciphertext_hex = "f6a0725fc47de532366f31050edbcc85";
+
+        // Convert the expected ciphertext from hex to bytes
+        let expected_ciphertext = hex::decode(expected_ciphertext_hex).unwrap();
+
+        // Encrypt the plaintext
+        let ciphertext = encrypt_ecb(plaintext.to_vec(), key);
+
+        // Assert that the ciphertext matches the expected output
+        assert_eq!(ciphertext, expected_ciphertext);
+    }
 }
