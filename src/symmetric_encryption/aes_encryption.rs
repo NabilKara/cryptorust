@@ -1,3 +1,4 @@
+use crate::symmetric_encryption::aes_decryption::decrypt_block;
 use crate::symmetric_encryption::aes_utils::{add_blocks, gal_mul, SBOX, key_expansion, pad_pkcs7};
 pub fn sub_bytes(state: &mut [u8 ; 16]){
         for byte in state.iter_mut(){
@@ -88,7 +89,7 @@ pub fn encrypt_block(input: &[u8;16], output: &mut[u8; 16], key: &[u8; 16]){
 }
 pub fn encrypt_ecb(plaintext: Vec<u8>, key: &[u8; 16]) -> Vec<u8> {
     let block_size: usize = 16;
-    let padded_plaintext = pad_pkcs7(plaintext, block_size);
+    let padded_plaintext = pad_pkcs7(&plaintext, block_size);
     let number_of_blocks = padded_plaintext.len() / block_size;
 
     let mut output = vec![0u8; number_of_blocks * block_size];
@@ -103,4 +104,48 @@ pub fn encrypt_ecb(plaintext: Vec<u8>, key: &[u8; 16]) -> Vec<u8> {
     }
 
     output
+}
+
+pub fn encrypt_cbc(plaintext: &Vec<u8>, iv : &[u8; 16] ,key: &[u8; 16]) -> Vec<u8> {
+    let block_size: usize = 16;
+    let padded_plaintext = pad_pkcs7(plaintext, block_size);
+    let mut ciphertext : Vec<u8> = Vec::new();
+    let mut last_block = *iv;
+    let num_blocks = padded_plaintext.len() / block_size;
+    for block_index in 0..num_blocks {
+        let mut block = [0u8; 16];
+        for a in 0..16{
+            block[a] = padded_plaintext[block_index * block_size + a];
+        }
+        add_blocks(&mut block, &last_block);
+        encrypt_block(&block.clone(), &mut block, &key);
+        last_block = block;
+        for b in block{
+            ciphertext.push(b);
+        }
+    }
+  ciphertext
+}
+pub fn decrypt_cbc(ciphertext: Vec<u8>, iv : &[u8; 16], key: &[u8; 16]) -> Result<Vec<u8>, &'static str> {
+    if ciphertext.len() < 16 {
+        return Err("ciphertext is too short");
+    }
+    let num_blocks = ciphertext.len() / 16;
+    let mut last = iv.clone();
+    let mut plaintext = vec![];
+
+    for block_index in 0..num_blocks {
+        let mut block: [u8; 16] = [0; 16];
+        for a in 0..16{
+            block[a] = ciphertext[block_index * 16 + a];
+        }
+        let xor = last;
+        last = block;
+        decrypt_block(&block.clone(), &mut block, &key);
+        add_blocks(&mut block, &xor);
+        for b in block{
+            plaintext.push(b);
+        }
+    }
+    Ok(plaintext)
 }

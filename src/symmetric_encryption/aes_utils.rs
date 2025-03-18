@@ -88,7 +88,7 @@ pub fn gal_mul(a: u8, b: u8) -> u8{
     }
     result
 }
-pub(crate) fn pad_pkcs7(data: Vec<u8>, block_size: usize) -> Vec<u8> {
+pub(crate) fn pad_pkcs7(data: &Vec<u8>, block_size: usize) -> Vec<u8> {
     let padding_length = block_size - (data.len() % block_size);
     let mut padded_data = data.clone();
     padded_data.extend(vec![padding_length as u8; padding_length]);
