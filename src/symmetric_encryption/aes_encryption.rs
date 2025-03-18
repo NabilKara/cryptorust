@@ -126,26 +126,3 @@ pub fn encrypt_cbc(plaintext: &Vec<u8>, iv : &[u8; 16] ,key: &[u8; 16]) -> Vec<u
     }
   ciphertext
 }
-pub fn decrypt_cbc(ciphertext: Vec<u8>, iv : &[u8; 16], key: &[u8; 16]) -> Result<Vec<u8>, &'static str> {
-    if ciphertext.len() < 16 {
-        return Err("ciphertext is too short");
-    }
-    let num_blocks = ciphertext.len() / 16;
-    let mut last = iv.clone();
-    let mut plaintext = vec![];
-
-    for block_index in 0..num_blocks {
-        let mut block: [u8; 16] = [0; 16];
-        for a in 0..16{
-            block[a] = ciphertext[block_index * 16 + a];
-        }
-        let xor = last;
-        last = block;
-        decrypt_block(&block.clone(), &mut block, &key);
-        add_blocks(&mut block, &xor);
-        for b in block{
-            plaintext.push(b);
-        }
-    }
-    Ok(plaintext)
-}
