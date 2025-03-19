@@ -96,7 +96,7 @@ pub fn decrypt_ecb(ciphertext: &Vec<u8>,key: &[u8; 16]) -> Result<Vec<u8>, &'sta
 
         output[block_size * i..block_size * (i + 1)].copy_from_slice(&decrypted_block);
     }
-    output
+    Ok(output)
 }
 pub fn decrypt_cbc(ciphertext: Vec<u8>, iv : &[u8; 16], key: &[u8; 16]) -> Result<Vec<u8>, &'static str> {
     if ciphertext.len() < 16 {

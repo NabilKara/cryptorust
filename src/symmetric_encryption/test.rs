@@ -2,8 +2,8 @@
 mod tests {
     use aes::Aes128;
     use aes::cipher::{Block, BlockEncrypt, KeyInit};
-    use crate::symmetric_encryption::aes_decryption::decrypt_block;
-    use crate::symmetric_encryption::aes_encryption::{sub_bytes, shift_rows, mix_columns, encrypt_block, encrypt_ecb, encrypt_cbc, decrypt_cbc};
+    use crate::symmetric_encryption::aes_decryption::{decrypt_block, decrypt_cbc};
+    use crate::symmetric_encryption::aes_encryption::{sub_bytes, shift_rows, mix_columns, encrypt_block, encrypt_ecb, encrypt_cbc};
     #[test]
     fn test_sub_bytes() {
         let mut state: [u8; 16] = [
@@ -198,20 +198,15 @@ mod tests {
     }
     #[test]
     fn test_encrypt_ecb() {
-        // Known plaintext, key, and expected ciphertext
-        let plaintext = b"Hello, world!12"; // 15 bytes
-        let key = b"0123456789abcdef"; // 16 bytes
+        let plaintext = b"Hello Nabil";
+        let key = b"0123456789abcdef";
 
-        // Expected ciphertext in hexadecimal format
-        let expected_ciphertext_hex = "f6a0725fc47de532366f31050edbcc85";
+        let expected_ciphertext_hex = "00b1b2b37c59b77f73dd786c8cb525f4";
 
-        // Convert the expected ciphertext from hex to bytes
         let expected_ciphertext = hex::decode(expected_ciphertext_hex).unwrap();
 
-        // Encrypt the plaintext
         let ciphertext = encrypt_ecb(plaintext.to_vec(), key);
 
-        // Assert that the ciphertext matches the expected output
         assert_eq!(ciphertext, expected_ciphertext);
     }
 }
