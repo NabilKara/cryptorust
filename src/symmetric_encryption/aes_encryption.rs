@@ -1,4 +1,3 @@
-use crate::symmetric_encryption::aes_decryption::decrypt_block;
 use crate::symmetric_encryption::aes_utils::{add_blocks, gal_mul, SBOX, key_expansion, pad_pkcs7};
 pub fn sub_bytes(state: &mut [u8 ; 16]){
         for byte in state.iter_mut(){

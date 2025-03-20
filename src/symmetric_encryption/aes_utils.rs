@@ -88,9 +88,21 @@ pub fn gal_mul(a: u8, b: u8) -> u8{
     }
     result
 }
-pub(crate) fn pad_pkcs7(data: &Vec<u8>, block_size: usize) -> Vec<u8> {
+pub fn pad_pkcs7(data: &Vec<u8>, block_size: usize) -> Vec<u8> {
     let padding_length = block_size - (data.len() % block_size);
     let mut padded_data = data.clone();
     padded_data.extend(vec![padding_length as u8; padding_length]);
     padded_data
+}
+pub fn remove_pad_pkcs7(data: &mut Vec<u8>, block_size: usize) -> Result<Vec<u8>, &'static str> {
+    if data.is_empty() {
+        return Err("Empty string");
+    }
+    let padding_byte = data[data.len() - 1];
+    for i in (data.len() - padding_byte as usize)..data.len() {
+        if data[i] != padding_byte {
+            return Err("Invalid padding");
+        }
+    }
+    Ok(data[..data.len()- padding_byte as usize].to_vec())
 }
