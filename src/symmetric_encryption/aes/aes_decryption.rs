@@ -1,5 +1,5 @@
-use crate::symmetric_encryption::aes_encryption::encrypt_block;
-use crate::symmetric_encryption::aes_utils::{add_blocks, gal_mul, INV_SBOX, key_expansion, pad_pkcs7, remove_pad_pkcs7};
+use crate::symmetric_encryption::aes::aes_encryption::encrypt_block;
+use crate::symmetric_encryption::aes::aes_utils::{add_blocks, gal_mul, INV_SBOX, key_expansion, pad_pkcs7, remove_pad_pkcs7};
 
 pub fn inv_sub_bytes(state: &mut [u8; 16]) {
     for byte in state.iter_mut(){

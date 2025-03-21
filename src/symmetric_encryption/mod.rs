@@ -1,5 +1,5 @@
 mod des;
-mod aes_encryption;
-mod test;
-mod aes_utils;
-mod aes_decryption;
+mod aes;
+pub mod menu;
+
+use crate::menu::*;
