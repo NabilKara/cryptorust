@@ -94,7 +94,7 @@ pub fn pad_pkcs7(data: &Vec<u8>, block_size: usize) -> Vec<u8> {
     padded_data.extend(vec![padding_length as u8; padding_length]);
     padded_data
 }
-pub fn remove_pad_pkcs7(data: &mut Vec<u8>, block_size: usize) -> Result<Vec<u8>, &'static str> {
+pub fn remove_pad_pkcs7(data: &mut Vec<u8>, _block_size: usize) -> Result<Vec<u8>, &'static str> {
     if data.is_empty() {
         return Err("Empty string");
     }

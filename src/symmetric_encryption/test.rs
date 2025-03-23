@@ -1,8 +1,7 @@
 #[cfg(test)]
 mod tests {
-    use crate::symmetric_encryption::aes_decryption::{decrypt_block, decrypt_cbc, decrypt_ecb};
-    use crate::symmetric_encryption::aes_encryption::{sub_bytes, shift_rows, mix_columns, encrypt_block, encrypt_ecb, encrypt_cbc};
-    use crate::symmetric_encryption::aes_utils::remove_pad_pkcs7;
+    use crate::symmetric_encryption::aes::aes_decryption::{decrypt_block, decrypt_cbc, decrypt_ecb};
+    use crate::symmetric_encryption::aes::aes_encryption::{sub_bytes, shift_rows, mix_columns, encrypt_block, encrypt_ecb, encrypt_cbc};
 
     #[test]
     fn test_sub_bytes() {
@@ -204,7 +203,7 @@ mod tests {
 
         let expected_plaintext = b"Hello Nabil";
 
-        let mut plaintext = decrypt_ecb(&ciphertext, key).unwrap();
+        let plaintext = decrypt_ecb(&ciphertext, key).unwrap();
         assert_eq!(plaintext, expected_plaintext);
     }
 

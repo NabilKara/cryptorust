@@ -11,7 +11,7 @@ fn printModesMenu(){
 }
 
 fn parseBytes(buf: String) -> Vec<u8> {
-    let mut rslt = vec![1 , 2, 3];
+    let mut rslt = Vec::new();
     let mut buffer: String;
     if buf.len() % 2 == 1 {
         buffer = String::from("0");
@@ -32,7 +32,7 @@ fn parseBytes(buf: String) -> Vec<u8> {
 }
 
 fn outputBytes(buf: Vec<u8>) {
-    for i in 0..buf.len() { print!("{:02X}", buf[i]); }
+    for i in (0..buf.len() - 1).step_by(2) { print!("{:02x}{:02x} ", buf[i], buf[i+1]); /* printing in big endian order, swap endianness to verify with openssl command */}
 }
 
 pub fn Menu(PATH: &mut String) -> u8 {
@@ -82,14 +82,14 @@ pub fn Menu(PATH: &mut String) -> u8 {
         1 => match m {
                 1 => encrypt_ecb(buf, &key),
                 2 => encrypt_cbc(&buf, &iv_arr, &key),
-                _ => panic!("Undefined mode"),
+                _ => panic!("Undefined mode for Encryption."),
             },
         2 => match m {
                 1 => decrypt_ecb(&buf, &key),
                 2 => decrypt_cbc(buf, &iv_arr, &key),
                 _ => panic!("Undefined mode"),
-            }.expect("Undefined mode"),
-        _ => panic!("Undefined mode"),
+            }.expect("Undefined mode for Decryption."),
+        _ => panic!("Undefined Encryption/Decryption choice."),
     };
 
     print!("\nResult: ");       outputBytes(output);        println!();
