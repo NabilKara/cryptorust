@@ -26,6 +26,10 @@ fn main() {
                 classical_ciphers::menu::Menu(&mut PATH);
                 println!("------------------------------");
             },
+            2 => {
+                symmetric_encryption::menu::Menu(&mut PATH);
+                println!("------------------------------");
+            }
             4 => {
                 println!("Good Bye !! ");
                 break;

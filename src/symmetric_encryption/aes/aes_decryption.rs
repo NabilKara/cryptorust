@@ -1,5 +1,4 @@
-use crate::symmetric_encryption::aes_encryption::encrypt_block;
-use crate::symmetric_encryption::aes_utils::{add_blocks, gal_mul, INV_SBOX, key_expansion, pad_pkcs7, remove_pad_pkcs7};
+use crate::symmetric_encryption::aes::aes_utils::{add_blocks, gal_mul, INV_SBOX, key_expansion, remove_pad_pkcs7};
 
 pub fn inv_sub_bytes(state: &mut [u8; 16]) {
     for byte in state.iter_mut(){
@@ -61,44 +60,7 @@ pub fn inv_mix_columns(state: &mut [u8; 16]) {
     state[15] = gal_mul(temp[12], 0xB) ^ gal_mul(temp[13], 0xD) ^ gal_mul(temp[14], 0x09) ^ gal_mul(temp[15], 0x0E);
 
 }
-// pub fn decrypt_block(input: &[u8; 16], output: &mut [u8; 16], key: &[u8; 16]){
-//     let mut state = *input;
-//     let mut expanded_key = [0u8; 176];
-//     key_expansion(key, &mut expanded_key);
-//     add_blocks(&mut state, &expanded_key[160..176]);
-//
-//     for round in (1..10).rev(){
-//         inv_shift_rows(&mut state);
-//         inv_sub_bytes(&mut state);
-//         add_blocks(&mut state, &expanded_key[round * 16..(round + 1)*16]);
-//         inv_mix_columns(&mut state);
-//     }
-//     inv_shift_rows(&mut state);
-//     inv_sub_bytes(&mut state);
-//     add_blocks(&mut state, &expanded_key[0..16]);
-//
-//     output.copy_from_slice(&state);
-// }
 
-// pub fn decrypt_ecb(ciphertext: &Vec<u8>,key: &[u8; 16]) -> Result<Vec<u8>, &'static str> {
-//     let block_size: usize = 16;
-//     if(ciphertext.len() % block_size != 0){
-//         return Err("Wrong length of ciphertext");
-//     }
-//     let number_of_blocks = ciphertext.len() / block_size;
-//
-//     let mut output = vec![0u8; number_of_blocks * block_size];
-//
-//     for (i, block) in ciphertext.chunks(block_size).enumerate() {
-//         let block_slice = <&[u8; 16]>::try_from(block).unwrap();
-//         let mut decrypted_block = [0u8; 16];
-//
-//         decrypt_block(block_slice, &mut decrypted_block, key);
-//
-//         output[block_size * i..block_size * (i + 1)].copy_from_slice(&decrypted_block);
-//     }
-//     Ok(output)
-// }
 pub fn decrypt_cbc(ciphertext: Vec<u8>, iv : &[u8; 16], key: &[u8; 16]) -> Result<Vec<u8>, &'static str> {
     if ciphertext.len() < 16 {
         return Err("ciphertext is too short");

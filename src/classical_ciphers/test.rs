@@ -55,11 +55,6 @@ mod tests {
     }
     #[test]
     fn test_playfair_cipher() {
-        let key = "GHedwa";
-        let plaintext = "Cipher";
-        let ciphertext = encrypt_playfair(plaintext, key);
-        let decrypted = decrypt_playfair(&ciphertext, key);
-
        assert_eq!(encrypt_playfair("cryptographie", "ghedwa"), "MXUSZTEPKUWBCE");
        assert_eq!(decrypt_playfair("MXUSZTEPKUWBCE", "ghedwa"), "CRYPTOGRAPHIEX");
     }
