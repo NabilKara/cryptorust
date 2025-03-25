@@ -1,7 +1,6 @@
 #![allow(nonstandard_style)]
 #![allow(dead_code)]
 
-use crate::symmetric_encryption::des::base::{encrypt_block, generateKeys, reduceKey, reverse_bits_u8, Rotate_28};
 
 mod classical_ciphers;
 mod menu;

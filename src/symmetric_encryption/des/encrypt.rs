@@ -8,7 +8,7 @@ fn pkcs5_pad(data: &mut Vec<u8>) -> &mut Vec<u8> {
 
 pub fn encryptECB(_plaintext: Vec<u8>, key: &[u8; constants::BLOCK_SIZE]) -> Vec<[u8; constants::BLOCK_SIZE]>  {
     let mut rslt = Vec::new();
-    let mut plaintext = _plaintext.clone();
+    let plaintext = _plaintext.clone();
     // pkcs5_pad(&mut plaintext);
 
     for (_i, block) in plaintext.chunks(constants::BLOCK_SIZE).enumerate() {

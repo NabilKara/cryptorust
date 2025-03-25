@@ -5,6 +5,11 @@ use super::constants;
 pub fn getBit_64(num: u64, pos: usize) -> u64 {
     (num & (1 << (64 - pos))) >> (64 - pos)
 }
+
+pub fn getBit_56(num: u64, pos: usize) -> u64 {
+    (num & (1 << (56 - pos))) >> (56 - pos)
+}
+
 pub fn getBit_32(num: u32, pos: usize) -> u32 {
     (num & (1 << (32 - pos))) >> (32 - pos)
 }
@@ -35,12 +40,12 @@ fn permute_56(input: u64, arr: &[usize; 56]) -> u64 {
     rslt & 0xFFFFFFFFFFFFFF
 }
 
-fn permute_48(input: u64, arr: &[usize; 48]) -> u64 {
+fn PC2Permutation(input: u64, arr: &[usize; 48]) -> u64 {
     let mut rslt: u64 = 0;
 
-    for i in 00..48 { rslt |= getBit_64(input, arr[i]) << (47 - i); }
+    for i in 00..48 { rslt |= getBit_56(input, arr[i]) << (47 - i); }
 
-    rslt & 0xFFFFFFFFFFFF
+    rslt & 0xFFFF_FFFF_FFFF
 }
 
 fn permute_32(input: u32, arr: &[usize; 32]) -> u32 {
@@ -52,13 +57,13 @@ fn permute_32(input: u32, arr: &[usize; 32]) -> u32 {
 }
 
 pub fn initialPermutation(input: u64) -> u64 {
-    // println!("---------------------------------- Initial Permutation -----------------------------------");
-    // println!("src: {:064b}", input);
+    println!("---------------------------------- Initial Permutation -----------------------------------");
+    println!("src: {:064b}", input);
 
     let rslt = permute_64(input, &constants::IP);
 
-    // println!("dst: {:064b}", rslt);
-    // println!("------------------------------------------------------------------------------------------");
+    println!("dst: {:064b}", rslt);
+    println!("------------------------------------------------------------------------------------------");
 
     rslt
 }
@@ -66,25 +71,25 @@ pub fn initialPermutation(input: u64) -> u64 {
 pub fn expansion(input: u32) -> u64 {
     let mut rslt: u64 = 0;
 
-    // println!("--------------------------------- Expansive Permutation ----------------------------------");
-    // println!("src: {}{:032b}", [" "; 32].join("") ,input);
+    println!("--------------------------------- Expansive Permutation ----------------------------------");
+    println!("src: {}{:032b}", [" "; 32].join("") ,input);
 
     for i in 0..constants::expansion_table.len() {
         rslt |= (getBit_32(input, constants::expansion_table[i]) as u64) << (47 - i);
     }
 
-    // println!("dst: {}{:048b}", [" "; 16].join(""), rslt);
-    // println!("------------------------------------------------------------------------------------------");
+    println!("dst: {}{:048b}", [" "; 16].join(""), rslt);
+    println!("------------------------------------------------------------------------------------------");
 
     rslt
 }
 
 fn XOR_48(input: u64, key: u64) -> u64 {
-    // println!("---------------------------------------- XOR Key -----------------------------------------");
-    // println!("src: {}{:048b}", [" "; 16].join(""), input);
+    println!("---------------------------------------- XOR Key -----------------------------------------");
+    println!("src: {}{:048b}", [" "; 16].join(""), input);
     let rslt = (input ^ key) & 0xFFFF_FFFF_FFFF;
-    // println!("dst: {}{:048b}", [" "; 16].join(""), rslt);
-    // println!("------------------------------------------------------------------------------------------");
+    println!("dst: {}{:048b}", [" "; 16].join(""), rslt);
+    println!("------------------------------------------------------------------------------------------");
 
     rslt
 }
@@ -92,8 +97,8 @@ fn XOR_48(input: u64, key: u64) -> u64 {
 pub fn SBox(input: u64) -> u32 {
     let mut rslt = String::new();
 
-    // println!("--------------------------------- S-Box Transformation -----------------------------------");
-    // println!("src: {}{:048b}", [" "; 16].join("") ,input);
+    println!("--------------------------------- S-Box Transformation -----------------------------------");
+    println!("src: {}{:048b}", [" "; 16].join("") ,input);
     let str_num = format!("{:048b}", input);
 
     for i in 0..8 {
@@ -104,8 +109,8 @@ pub fn SBox(input: u64) -> u32 {
 
     }
     let rslt = u32::from_str_radix(rslt.as_str(), 2).unwrap();
-    // println!("dst: {}{:032b}", [" "; 32].join(""), rslt);
-    // println!("------------------------------------------------------------------------------------------");
+    println!("dst: {}{:032b}", [" "; 32].join(""), rslt);
+    println!("------------------------------------------------------------------------------------------");
 
     rslt
 }
@@ -118,31 +123,38 @@ fn SBox_Transform(input: u8, table: &[[usize; 16]; 4]) -> u8 {
 }
 
 fn PBox_Permutation(input: u32) -> u32 {
-    // println!("----------------------------------- P-Box Permutation ------------------------------------");
-    // println!("src: {}{:032b}", [" "; 32].join(""), input);
+    println!("----------------------------------- P-Box Permutation ------------------------------------");
+    println!("src: {}{:032b}", [" "; 32].join(""), input);
 
     let rslt = permute_32(input, &constants::P_BOX);
 
-    // println!("dst: {}{:032b}", [" "; 32].join(""), rslt);
-    // println!("------------------------------------------------------------------------------------------");
+    println!("dst: {}{:032b}", [" "; 32].join(""), rslt);
+    println!("------------------------------------------------------------------------------------------");
 
     rslt
 }
 
 fn FinalPermutation(input: u64) -> u64 {
-    // println!("----------------------------------- Final Permutation ------------------------------------");
-    // println!("src: {:064b}", input);
+    println!("----------------------------------- Final Permutation ------------------------------------");
+    println!("src: {:064b}", input);
 
     let rslt = permute_64(input, &constants::FINAL_PERMUTATION);
 
-    // println!("dst: {:064b}", rslt);
-    // println!("------------------------------------------------------------------------------------------");
+    println!("dst: {:064b}", rslt);
+    println!("------------------------------------------------------------------------------------------");
 
     rslt
 }
 
 pub fn reduceKey(input: u64) -> u64 {
+    println!("------------------------------------- Key Reduction --------------------------------------");
+    println!("src: {:064b}", input);
+
+    println!("dst: {}{:056b}", [" "; 8].join(""), permute_56(input, &constants::PC1));
+    println!("------------------------------------------------------------------------------------------");
+
     permute_56(input, &constants::PC1)
+
 }
 
 pub fn Rotate_28(data: u32, count: usize) -> u32 {
@@ -151,22 +163,36 @@ pub fn Rotate_28(data: u32, count: usize) -> u32 {
 }
 
 pub fn permute_subKey(input: u64) -> u64 {
-    permute_48(input, &constants::PC2)
+    println!("-----------------------------------Sub-Key Permutation -----------------------------------");
+    println!("src: {}{:056b}", [" "; 8].join(""), input);
+
+    println!("dst: {}{:048b}", [" "; 16].join(""), PC2Permutation(input, &constants::PC2));
+    println!("------------------------------------------------------------------------------------------");
+
+    PC2Permutation(input, &constants::PC2)
 }
 
 pub fn generateKeys(_key: &[u8; 8]) -> [u64; 16] {
+    println!("------------------------------------ Key Generation --------------------------------------");
     let mut rslt: [u64; 16] = [0; 16];
     let mut key = u64::from_be_bytes(*_key);
+    println!("src: {:064b}\n", key);
     key = reduceKey(key);
     let mut L_Half: u32 = (key >> 28) as u32;
     let mut R_Half: u32 = (key & 0xFFFFFFF) as u32;
 
     for i in 0..16 {
+        // println!("------------------------------------ Rotate Halves ---------------------------------------");
+        // println!("src: {}{:056b}", [" "; 8].join(""), ((L_Half as u64) << 28) | R_Half as u64);
         L_Half = Rotate_28(L_Half, constants::KEY_ROTATIONS[i]);
         R_Half = Rotate_28(R_Half, constants::KEY_ROTATIONS[i]);
-        key = ((L_Half << 28) as u64) | R_Half as u64;
+        // println!("dst: {}{:056b}", [" "; 8].join(""), ((L_Half as u64) << 28) | R_Half as u64);
+        // println!("------------------------------------------------------------------------------------------");
+
+        key = ((L_Half as u64) << 28) | R_Half as u64;
         rslt[i] = permute_subKey(key);
     }
+    println!("------------------------------------------------------------------------------------------\n\n");
     rslt
 }
 
@@ -175,16 +201,29 @@ pub fn encrypt_block(block: &[u8; constants::BLOCK_SIZE], _key: &[u8; constants:
     let mut data = u64::from_be_bytes(*block);
     data = initialPermutation(data);
 
+    println!("------------------------------------ Split LPR RPT --------------------------------------");
     let mut LPT: u32 = (data >> 32) as u32;
     let mut RPT: u32 = (data & 0xFFFFFFFF) as u32;
+    println!("LPT: {}{:032b}", [" "; 32].join(""), LPT);
+    println!("RPT: {}{:032b}", [" "; 32].join(""), RPT);
+    println!("------------------------------------------------------------------------------------------");
+
     for iteration in 0..16 {
         let mut eRPT = expansion(RPT);
 
         eRPT = XOR_48(eRPT, keys[iteration]);
         RPT = SBox(eRPT);
         RPT = PBox_Permutation(RPT);
+        println!("------------------------------- XOR wih left and grouping -------------------------------");
+        println!("src: {}{:032b}", [" "; 32].join(""), RPT);
+        // Maybe do ? and check result
+        //         temp = R;
+        //         R = L ^ modified_R;
+        //         L = temp;
         RPT ^= LPT;
-        
+        println!("dst: {:032b} {:032b}", LPT, RPT);
+        println!("------------------------------------------------------------------------------------------");
+        break;
         if iteration != 15 { swap(&mut RPT, &mut LPT); }
     }
 
