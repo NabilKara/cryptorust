@@ -1,4 +1,3 @@
-use std::mem::swap;
 use super::constants;
 
 // 'pos' from 1 .. 64
@@ -147,12 +146,11 @@ fn FinalPermutation(input: u64) -> u64 {
 }
 
 pub fn reduceKey(input: u64) -> u64 {
-    println!("------------------------------------- Key Reduction --------------------------------------");
-    println!("src: {:064b}", input);
-
-    println!("dst: {}{:056b}", [" "; 8].join(""), permute_56(input, &constants::PC1));
-    println!("------------------------------------------------------------------------------------------");
-
+    // println!("------------------------------------- Key Reduction --------------------------------------");
+    // println!("src: {:064b}", input);
+    //
+    // println!("dst: {}{:056b}", [" "; 8].join(""), permute_56(input, &constants::PC1));
+    // println!("------------------------------------------------------------------------------------------");
     permute_56(input, &constants::PC1)
 
 }
@@ -163,20 +161,19 @@ pub fn Rotate_28(data: u32, count: usize) -> u32 {
 }
 
 pub fn permute_subKey(input: u64) -> u64 {
-    println!("-----------------------------------Sub-Key Permutation -----------------------------------");
-    println!("src: {}{:056b}", [" "; 8].join(""), input);
-
-    println!("dst: {}{:048b}", [" "; 16].join(""), PC2Permutation(input, &constants::PC2));
-    println!("------------------------------------------------------------------------------------------");
-
+    // println!("-----------------------------------Sub-Key Permutation -----------------------------------");
+    // println!("src: {}{:056b}", [" "; 8].join(""), input);
+    //
+    // println!("dst: {}{:048b}", [" "; 16].join(""), PC2Permutation(input, &constants::PC2));
+    // println!("------------------------------------------------------------------------------------------");
     PC2Permutation(input, &constants::PC2)
 }
 
 pub fn generateKeys(_key: &[u8; 8]) -> [u64; 16] {
-    println!("------------------------------------ Key Generation --------------------------------------");
     let mut rslt: [u64; 16] = [0; 16];
     let mut key = u64::from_be_bytes(*_key);
-    println!("src: {:064b}\n", key);
+    // println!("------------------------------------ Key Generation --------------------------------------");
+    // println!("src: {:064b}\n", key);
     key = reduceKey(key);
     let mut L_Half: u32 = (key >> 28) as u32;
     let mut R_Half: u32 = (key & 0xFFFFFFF) as u32;
@@ -192,23 +189,26 @@ pub fn generateKeys(_key: &[u8; 8]) -> [u64; 16] {
         key = ((L_Half as u64) << 28) | R_Half as u64;
         rslt[i] = permute_subKey(key);
     }
-    println!("------------------------------------------------------------------------------------------\n\n");
+    // println!("------------------------------------------------------------------------------------------\n\n");
     rslt
 }
 
-pub fn encrypt_block(block: &[u8; constants::BLOCK_SIZE], _key: &[u8; constants::BLOCK_SIZE]) -> [u8; constants::BLOCK_SIZE] {
-    let keys = generateKeys(&_key);
+pub fn encrypt_block(block: &[u8; constants::BLOCK_SIZE], keys: &[u64; constants::ITERATION_NB]) -> [u8; constants::BLOCK_SIZE] {
+    // let keys = generateKeys(&_key);
     let mut data = u64::from_be_bytes(*block);
     data = initialPermutation(data);
 
     println!("------------------------------------ Split LPR RPT --------------------------------------");
     let mut LPT: u32 = (data >> 32) as u32;
-    let mut RPT: u32 = (data & 0xFFFFFFFF) as u32;
+    let mut RPT_0: u32 = (data & 0xFFFFFFFF) as u32;    // Original RPT, goes Into LPT at end of iteration
+    let mut RPT: u32 = RPT_0;                             // The RPT that will be modified through the iteration
     println!("LPT: {}{:032b}", [" "; 32].join(""), LPT);
-    println!("RPT: {}{:032b}", [" "; 32].join(""), RPT);
+    println!("RPT: {}{:032b}", [" "; 32].join(""), RPT_0);
     println!("------------------------------------------------------------------------------------------");
 
-    for iteration in 0..16 {
+    for iteration in 0..constants::ITERATION_NB {
+        println!("------------------------------------- Iteration N°{} -------------------------------------", iteration);
+        RPT_0 = RPT;
         let mut eRPT = expansion(RPT);
 
         eRPT = XOR_48(eRPT, keys[iteration]);
@@ -216,18 +216,16 @@ pub fn encrypt_block(block: &[u8; constants::BLOCK_SIZE], _key: &[u8; constants:
         RPT = PBox_Permutation(RPT);
         println!("------------------------------- XOR wih left and grouping -------------------------------");
         println!("src: {}{:032b}", [" "; 32].join(""), RPT);
-        // Maybe do ? and check result
-        //         temp = R;
-        //         R = L ^ modified_R;
-        //         L = temp;
+
         RPT ^= LPT;
-        println!("dst: {:032b} {:032b}", LPT, RPT);
+        LPT = RPT_0;
+
+        println!("dst: {:032b}{:032b}", RPT, RPT_0);
         println!("------------------------------------------------------------------------------------------");
-        break;
-        if iteration != 15 { swap(&mut RPT, &mut LPT); }
+        println!("------------------------------------------------------------------------------------------\n\n");
     }
 
-    data = ((LPT as u64) << 32) | RPT as u64;       // Group the halves
+    data = ((RPT as u64) << 32) | RPT_0 as u64;       // Group the halves, I really don't know why RPT and RPT_0, but it is what it is, verified answer.
     data = FinalPermutation(data);
 
     data.to_be_bytes()

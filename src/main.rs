@@ -72,19 +72,25 @@ fn main() {
     let cleartext: Vec<u8> = _cleartext.to_vec();
     let ciphertext = symmetric_encryption::des::encrypt::encryptECB(cleartext, &key);
     let mut rslt = Vec::new();
-
+    
     for i in 0..ciphertext.len() {
         rslt.extend(ciphertext[i]);
     }
-
+    
     outputBytes(rslt);
 
-
-
-    // let v0: u32 = 0b0000_0101_0001_0000_1111_1111_1111_0101;
-    // let v1 = Rotate_28(v0, 2);
-    // println!("0: {:028b}", v0);
-    // println!("1: {:028b}", v1);
+    // let key = [0x75, 0x28, 0x78, 0x39, 0x74, 0x93, 0xCB, 0x70];
+    // let _cleartext = [0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88];
+    // let iv  = [0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37];  // '01234567'
+    // let cleartext: Vec<u8> = _cleartext.to_vec();
+    // let ciphertext = symmetric_encryption::des::encrypt::encryptCBC(cleartext, &iv, &key);
+    // let mut rslt = Vec::new();
+    // 
+    // for i in 0..ciphertext.len() {
+    //     rslt.extend(ciphertext[i]);
+    // }
+    // 
+    // outputBytes(rslt);
 }
 
 fn outputBytes(buf: Vec<u8>) {

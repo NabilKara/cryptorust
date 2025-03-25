@@ -1,6 +1,7 @@
 pub const BLOCK_SIZE: usize = 8;
 pub const HALF_SIZE: usize = BLOCK_SIZE / 2;
 pub const EXPANDED_SIZE: usize = HALF_SIZE + HALF_SIZE / 2;
+pub const ITERATION_NB: usize = 16;
 pub const IP: [usize; 64] = [
     58, 50, 42, 34, 26, 18, 10, 2,
     60, 52, 44, 36, 28, 20, 12, 4,
