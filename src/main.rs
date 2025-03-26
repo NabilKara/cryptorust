@@ -1,6 +1,8 @@
 #![allow(nonstandard_style)]
 #![allow(dead_code)]
 
+use num::Integer;
+
 mod classical_ciphers;
 mod menu;
 mod symmetric_encryption;
@@ -12,6 +14,7 @@ fn printMenu(){
     println!("3- Help");
     println!("4- Quit");
 }
+
 
 fn main() {
     print!("{esc}[2J{esc}[1;1H", esc = 27 as char);
@@ -39,4 +42,17 @@ fn main() {
             }
         }
     }
+}
+
+fn outputBytes(buf: Vec<u8>) {
+    if buf.len().is_even() {
+        for i in (0..buf.len() - 1).step_by(2) { print!("{:02x}{:02x} ", buf[i], buf[i+1]);/* printing in big endian order, swap endianness to verify with openssl command */}
+    }
+    else {
+        for i in (0..buf.len() - 2).step_by(2) {
+            print!("{:02x}{:02x} ", buf[i], buf[i+1]);
+        }
+        print!("{:02x} ", buf[buf.len() - 1]);
+    }
+    println!();
 }
