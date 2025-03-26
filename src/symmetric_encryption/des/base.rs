@@ -1,4 +1,3 @@
-use crate::symmetric_encryption::des::constants::operation;
 use super::constants;
 
 // 'pos' from 1 .. 64
@@ -146,11 +145,11 @@ pub fn doBlock(block: &[u8; constants::BLOCK_SIZE], keys: &[u64; constants::ITER
     let mut RPT: u32 = RPT_0;                             // The RPT that will be modified through the iteration
 
     match op {
-        operation::Encrypt =>
+        constants::operation::Encrypt =>
             for iteration in 0..constants::ITERATION_NB {
                 doRound(&mut LPT, &mut RPT, &mut RPT_0, keys[iteration]);
             }
-        operation::Decrypt =>
+        constants::operation::Decrypt =>
             for iteration in (0..constants::ITERATION_NB).rev() {
                 doRound(&mut LPT, &mut RPT, &mut RPT_0, keys[iteration]);
             }

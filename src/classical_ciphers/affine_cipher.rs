@@ -34,7 +34,7 @@ pub fn decrypt_affine(ciphertext: &str, a : u8, b : u8) -> String {
     }).collect()
 }
 
-pub fn Menu(PATH: &mut String) -> u8 {
+pub fn Menu(PATH: &mut String) -> usize {
     let mut buf = String::new();
     let mut a = String::new();
     let mut b = String::new();

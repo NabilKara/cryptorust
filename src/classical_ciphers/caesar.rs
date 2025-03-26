@@ -19,7 +19,7 @@ pub fn decrypt_caesar(plaintext: &str,shift: u8) -> String {
     encrypt_caesar(plaintext, ALPHABET_SIZE - (shift % ALPHABET_SIZE))
 }
 
-pub fn Menu(PATH: &mut String) -> u8 {
+pub fn Menu(PATH: &mut String) -> usize {
     let mut buf = String::new();
     let mut shift = String::new();
     let r;

@@ -2,6 +2,7 @@ use std::io;
 use std::io::Write;
 use crate::symmetric_encryption::aes::aes_decryption::{decrypt_cbc, decrypt_ecb};
 use crate::symmetric_encryption::aes::aes_encryption::{encrypt_cbc, encrypt_ecb};
+use super::super::menu::outputBytes;
 
 fn printModesMenu(){
     println!("Choose mode:");
@@ -31,11 +32,7 @@ fn parseBytes(buf: String) -> Vec<u8> {
     rslt
 }
 
-fn outputBytes(buf: Vec<u8>) {
-    for i in (0..buf.len() - 1).step_by(2) { print!("{:02x}{:02x} ", buf[i], buf[i+1]); /* printing in big endian order, swap endianness to verify with openssl command */}
-}
-
-pub fn Menu(PATH: &mut String) -> u8 {
+pub fn Menu(PATH: &mut String) -> usize {
     let mut buf = String::new();
     let mut key = String::new();
     let mut iv = String::new();

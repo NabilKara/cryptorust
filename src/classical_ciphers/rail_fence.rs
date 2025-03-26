@@ -107,7 +107,7 @@ pub fn decrypt(text: &str, rails: u8) -> String {
     result
 }
 
-pub fn Menu(PATH: &mut String) -> u8 {
+pub fn Menu(PATH: &mut String) -> usize {
     let mut buf = String::new();
     let mut rails = String::new();
     let r;

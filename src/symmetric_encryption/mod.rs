@@ -1,4 +1,4 @@
-mod des;
+pub mod des;
 mod aes;
 pub mod menu;
 mod test;
