@@ -14,7 +14,7 @@ pub fn encryptECB(_plaintext: Vec<u8>, key: &[u8; constants::BLOCK_SIZE]) -> Vec
     for (_i, block) in plaintext.chunks(constants::BLOCK_SIZE).enumerate() {
         let block_slice = <&[u8; constants::BLOCK_SIZE]>::try_from(block).unwrap();
 
-        rslt.push(base::encrypt_block(block_slice, &keys));
+        rslt.push(base::doBlock(&block_slice, &keys, constants::operation::Encrypt));
     }
 
     rslt
@@ -31,7 +31,7 @@ pub fn encryptCBC(_plaintext: Vec<u8>, _iv: &[u8; constants::BLOCK_SIZE], key: &
     for block in plaintext.chunks(constants::BLOCK_SIZE) {
         let block_slice = <&[u8; constants::BLOCK_SIZE]>::try_from(block).unwrap();
         let mut encrypted_block = base::xorIV(&block_slice, &iv);
-        encrypted_block = base::encrypt_block(&encrypted_block, &keys);
+        encrypted_block = base::doBlock(&encrypted_block, &keys, constants::operation::Encrypt);
 
         iv = encrypted_block.clone();
         rslt.push(encrypted_block);

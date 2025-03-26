@@ -1,3 +1,4 @@
+use crate::symmetric_encryption::des::constants::operation;
 use super::constants;
 
 // 'pos' from 1 .. 64
@@ -123,58 +124,40 @@ pub fn generateKeys(_key: &[u8; 8]) -> [u64; 16] {
     rslt
 }
 
-pub fn encrypt_block(block: &[u8; constants::BLOCK_SIZE], keys: &[u64; constants::ITERATION_NB]) -> [u8; constants::BLOCK_SIZE] {
-    let mut data = u64::from_be_bytes(*block);
-    data = initialPermutation(data);
+fn doRound(LPT: &mut u32, RPT: &mut u32, RPT_0: &mut u32, key: u64) {
+    *RPT_0 = *RPT;
+    let mut eRPT = expansion(*RPT);
 
-    let mut LPT: u32 = (data >> 32) as u32;
-    let mut RPT_0: u32 = (data & 0xFFFFFFFF) as u32;    // Original RPT, goes Into LPT at end of iteration
-    let mut RPT: u32 = RPT_0;                             // The RPT that will be modified through the iteration
+    eRPT = XOR_48(eRPT, key);
+    *RPT = SBox(eRPT);
+    *RPT = PBox_Permutation(*RPT);
 
-    for iteration in 0..constants::ITERATION_NB {
-        RPT_0 = RPT;
-        let mut eRPT = expansion(RPT);
-
-        eRPT = XOR_48(eRPT, keys[iteration]);
-        RPT = SBox(eRPT);
-        RPT = PBox_Permutation(RPT);
-        
-        // Swap
-        RPT ^= LPT;
-        LPT = RPT_0;
-    }
-    
-// Group the halves, I really don't know why RPT and RPT_0, maybe because I also swapped at last iteration ? anyway it's correct and verified.
-    data = ((RPT as u64) << 32) | RPT_0 as u64;
-    data = FinalPermutation(data);
-
-    data.to_be_bytes()
+    // Swap
+    *RPT ^= *LPT;
+    *LPT = *RPT_0;
 }
 
-pub fn decrypt_block(block: &[u8; constants::BLOCK_SIZE], keys: &[u64; constants::ITERATION_NB]) -> [u8; constants::BLOCK_SIZE] {
-    // let keys = generateKeys(&_key);
+pub fn doBlock(block: &[u8; constants::BLOCK_SIZE], keys: &[u64; constants::ITERATION_NB], op: constants::operation) -> [u8; constants::BLOCK_SIZE] {
     let mut data = u64::from_be_bytes(*block);
     data = initialPermutation(data);
 
     let mut LPT: u32 = (data >> 32) as u32;
     let mut RPT_0: u32 = (data & 0xFFFFFFFF) as u32;    // Original RPT, goes Into LPT at end of iteration
     let mut RPT: u32 = RPT_0;                             // The RPT that will be modified through the iteration
-    
-    let mut iteration: isize = constants::ITERATION_NB as isize - 1;
-    while iteration >= 0 {
-        RPT_0 = RPT;
-        let mut eRPT = expansion(RPT);
 
-        eRPT = XOR_48(eRPT, keys[iteration as usize]);
-        RPT = SBox(eRPT);
-        RPT = PBox_Permutation(RPT);
-
-        RPT ^= LPT;
-        LPT = RPT_0;
-        iteration -= 1;
+    match op {
+        operation::Encrypt =>
+            for iteration in 0..constants::ITERATION_NB {
+                doRound(&mut LPT, &mut RPT, &mut RPT_0, keys[iteration]);
+            }
+        operation::Decrypt =>
+            for iteration in (0..constants::ITERATION_NB).rev() {
+                doRound(&mut LPT, &mut RPT, &mut RPT_0, keys[iteration]);
+            }
     }
 
-    data = ((RPT as u64) << 32) | RPT_0 as u64;       // Group the halves, I really don't know why RPT and RPT_0, but it is what it is, verified answer.
+    // Group the halves, I really don't know why RPT and RPT_0, maybe because I also swapped at last iteration ? anyway it's correct and verified.
+    data = ((RPT as u64) << 32) | RPT_0 as u64;
     data = FinalPermutation(data);
 
     data.to_be_bytes()

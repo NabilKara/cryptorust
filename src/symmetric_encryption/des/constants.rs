@@ -125,3 +125,8 @@ pub const PC2: [usize; 48] = [
     51, 45, 33, 48, 44, 49, 39, 56,
     34, 53, 46, 42, 50, 36, 29, 32,
 ];
+
+pub enum operation {
+    Encrypt,
+    Decrypt,
+}
