@@ -5,6 +5,9 @@ mod classical_ciphers;
 mod menu;
 mod symmetric_encryption;
 
+mod asymmetric_encryption;
+
+use crate::asymmetric_encryption::*;
 fn printMenu(){
     println!("PLease choose an option:");
     println!("1- Ciphers");
@@ -39,4 +42,5 @@ fn main() {
             }
         }
     }
+
 }
