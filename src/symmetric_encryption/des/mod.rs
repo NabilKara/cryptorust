@@ -1,5 +1,5 @@
 pub mod base;
 pub mod constants;
-mod tests;
 pub mod encrypt;
-
+pub mod decrypt;
+mod tests;
