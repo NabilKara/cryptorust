@@ -1,6 +1,5 @@
 use super::{constants, base};
-
-pub fn pkcs5_unpad(blocks: &mut Vec<[u8; constants::BLOCK_SIZE]>) -> Vec<u8>{
+fn pkcs5_unpad(blocks: &mut Vec<[u8; constants::BLOCK_SIZE]>) -> Vec<u8>{
     let mut rslt = Vec::new();
     let block = blocks.last().unwrap();
     let blocks_len = blocks.len();

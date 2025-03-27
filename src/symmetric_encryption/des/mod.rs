@@ -1,5 +1,7 @@
 pub mod base;
 pub mod constants;
-pub mod encrypt;
-pub mod decrypt;
+mod encrypt;
+mod decrypt;
 mod tests;
+pub mod menu;
+use super::*;

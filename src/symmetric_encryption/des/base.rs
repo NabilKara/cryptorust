@@ -1,15 +1,15 @@
 use super::constants;
 
 // 'pos' from 1 .. 64
-pub fn getBit_64(num: u64, pos: usize) -> u64 {
+fn getBit_64(num: u64, pos: usize) -> u64 {
     (num & (1 << (64 - pos))) >> (64 - pos)
 }
 
-pub fn getBit_56(num: u64, pos: usize) -> u64 {
+fn getBit_56(num: u64, pos: usize) -> u64 {
     (num & (1 << (56 - pos))) >> (56 - pos)
 }
 
-pub fn getBit_32(num: u32, pos: usize) -> u32 {
+fn getBit_32(num: u32, pos: usize) -> u32 {
     (num & (1 << (32 - pos))) >> (32 - pos)
 }
 
@@ -55,9 +55,9 @@ fn permute_32(input: u32, arr: &[usize; 32]) -> u32 {
     rslt
 }
 
-pub fn initialPermutation(input: u64) -> u64 { permute_64(input, &constants::IP) }
+fn initialPermutation(input: u64) -> u64 { permute_64(input, &constants::IP) }
 
-pub fn expansion(input: u32) -> u64 {
+fn expansion(input: u32) -> u64 {
     let mut rslt: u64 = 0;
 
     for i in 0..constants::expansion_table.len() {
@@ -71,7 +71,7 @@ fn XOR_48(input: u64, key: u64) -> u64 {
     (input ^ key) & 0xFFFF_FFFF_FFFF
 }
 
-pub fn SBox(input: u64) -> u32 {
+fn SBox(input: u64) -> u32 {
     let mut rslt = String::new();
     let str_num = format!("{:048b}", input);
 
@@ -96,14 +96,14 @@ fn PBox_Permutation(input: u32) -> u32 { permute_32(input, &constants::P_BOX) }
 
 fn FinalPermutation(input: u64) -> u64 { permute_64(input, &constants::FINAL_PERMUTATION) }
 
-pub fn reduceKey(input: u64) -> u64 { permute_56(input, &constants::PC1) }
+fn reduceKey(input: u64) -> u64 { permute_56(input, &constants::PC1) }
 
-pub fn Rotate_28(data: u32, count: usize) -> u32 {
+fn Rotate_28(data: u32, count: usize) -> u32 {
     let count = count % 28;
     ((data << count) | (data >> (28 - count))) & 0xF_FFF_FFF
 }
 
-pub fn permute_subKey(input: u64) -> u64 { PC2Permutation(input, &constants::PC2) }
+fn permute_subKey(input: u64) -> u64 { PC2Permutation(input, &constants::PC2) }
 
 pub fn generateKeys(_key: &[u8; 8]) -> [u64; 16] {
     let mut rslt: [u64; 16] = [0; 16];

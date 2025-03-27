@@ -28,21 +28,13 @@ fn main() {
         let r = menu::getInput(PATH.clone(), 1, options.len());
         print!("{esc}[2J{esc}[1;1H", esc = 27 as char);
         match r {
-            1 => {
-                classical_ciphers::menu::Menu(&mut PATH);
-                println!("------------------------------");
-            },
-            2 => {
-                symmetric_encryption::menu::Menu(&mut PATH);
-                println!("------------------------------");
-            }
+            1 => classical_ciphers::menu::Menu(&mut PATH),
+            2 => symmetric_encryption::menu::Menu(&mut PATH),
             5 => {
                 println!("Good Bye !! ");
                 break;
             },
-            _ => {
-                println!("This option isn't yet available");
-            }
+            _ => println!("This option isn't yet available"),
         }
     }
 }

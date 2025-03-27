@@ -5,7 +5,7 @@ fn pkcs5_pad(data: &mut Vec<u8>) -> &mut Vec<u8> {
     data
 }
 
-pub fn encryptECB(_plaintext: Vec<u8>, key: &[u8; constants::BLOCK_SIZE]) -> Vec<[u8; constants::BLOCK_SIZE]>  {
+pub fn encryptECB(_plaintext: Vec<u8>, key: &[u8; constants::BLOCK_SIZE]) -> Vec<u8>  {
     let mut rslt = Vec::new();
     let mut plaintext = _plaintext.clone();
     pkcs5_pad(&mut plaintext);
@@ -14,13 +14,13 @@ pub fn encryptECB(_plaintext: Vec<u8>, key: &[u8; constants::BLOCK_SIZE]) -> Vec
     for (_i, block) in plaintext.chunks(constants::BLOCK_SIZE).enumerate() {
         let block_slice = <&[u8; constants::BLOCK_SIZE]>::try_from(block).unwrap();
 
-        rslt.push(base::doBlock(&block_slice, &keys, constants::operation::Encrypt));
+        rslt.extend(base::doBlock(&block_slice, &keys, constants::operation::Encrypt));
     }
 
     rslt
 }
 
-pub fn encryptCBC(_plaintext: Vec<u8>, _iv: &[u8; constants::BLOCK_SIZE], key: &[u8; constants::BLOCK_SIZE]) -> Vec<[u8; constants::BLOCK_SIZE]> {
+pub fn encryptCBC(_plaintext: Vec<u8>, _iv: &[u8; constants::BLOCK_SIZE], key: &[u8; constants::BLOCK_SIZE]) -> Vec<u8> {
     let mut rslt = Vec::new();
     let mut plaintext = _plaintext.clone();
     pkcs5_pad(&mut plaintext);
@@ -34,7 +34,7 @@ pub fn encryptCBC(_plaintext: Vec<u8>, _iv: &[u8; constants::BLOCK_SIZE], key: &
         encrypted_block = base::doBlock(&encrypted_block, &keys, constants::operation::Encrypt);
 
         iv = encrypted_block.clone();
-        rslt.push(encrypted_block);
+        rslt.extend(encrypted_block);
     }
 
     rslt

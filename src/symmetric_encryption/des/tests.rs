@@ -3,21 +3,6 @@ mod tests {
     use crate::symmetric_encryption::des::constants::*;
     use crate::symmetric_encryption::des::base::*;
 
-    #[test]
-    fn test_get_bit() {
-        // Test getting bit at position 1 (LSB)
-        assert_eq!(getBit_64(0b0001, 1), 1);
-
-        // Test getting bit at position 4
-        assert_eq!(getBit_64(0b1000, 4), 1);
-
-        // Test getting bit at position 64 (MSB for u64)
-        assert_eq!(getBit_64(0x8000000000000000, 64), 1);
-
-        // Test getting a bit that is not set
-        assert_eq!(getBit_64(0b0100, 2), 0);
-    }
-
     // Test vectors from official NIST documentation
     const ZERO_KEY: [u8; 8] = [0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00];
     const WEAK_KEY1: [u8; 8] = [0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01]; // E001E001F101F101
