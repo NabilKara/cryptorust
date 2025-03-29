@@ -1,9 +1,13 @@
 #[cfg(test)]
 mod tests {
-    use num_bigint::BigUint;
+    use num_bigint::{BigUint, RandBigInt};
+    use rand::thread_rng;
     use crate::asymmetric_encryption::RSA::{decrypt_rsa, encrypt_rsa, rsa_generate_key_pair};
     use crate::asymmetric_encryption::DH_key_exchange::{DH_generate_key_pair,DH_shared_secret,MODP_2048};
-        #[test]
+    use crate::asymmetric_encryption::ElGamal::{ElGamal_generate_keys, ElGamal_decrypt, ElGamal_encrypt};
+    use crate::asymmetric_encryption::utils::SECURE_PRIME;
+
+    #[test]
         fn generate_key_pair(){
             let (n,e,d) = rsa_generate_key_pair(512, 5);
             println!("n: {}",n);
@@ -36,5 +40,28 @@ mod tests {
             let bob_shared_secret = DH_shared_secret(&bob_private, &alice_public, &*MODP_2048);
             assert_eq!(alice_shared_secret, bob_shared_secret, "Shared secrets should be the same");
         }
+    #[test]
+    fn test_elgamal_encryption_decryption() {
+        use super::*;
+        use num_bigint::{BigUint, RandBigInt};
+        use rand::thread_rng;
+
+        let p = SECURE_PRIME.clone();
+        let g = BigUint::from(2u32);
+        let mut rng = thread_rng();
+
+        let private_key = rng.gen_biguint_range(&BigUint::from(2u32), &(p.clone() - BigUint::from(2u32) ));
+
+        let public_key = g.modpow(&private_key, &p);
+
+        let message = rng.gen_biguint_range(&BigUint::from(2u32), &(p.clone() - BigUint::from(2u32)));
+
+        let (ciphertext, ephemeral_key) = ElGamal_encrypt(&message, &public_key, &p, &g);
+
+        let decrypted_message = ElGamal_decrypt(&ciphertext, &ephemeral_key, &p, &private_key);
+
+        assert_eq!(message, decrypted_message, "Decryption failed: Messages do not match!");
+    }
+
 
 }
