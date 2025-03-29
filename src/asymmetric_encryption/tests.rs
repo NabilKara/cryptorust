@@ -1,7 +1,8 @@
 #[cfg(test)]
 mod tests {
     use num_bigint::BigUint;
-        use crate::asymmetric_encryption::RSA::{decrypt_rsa, encrypt_rsa, rsa_generate_key_pair};
+    use crate::asymmetric_encryption::RSA::{decrypt_rsa, encrypt_rsa, rsa_generate_key_pair};
+    use crate::asymmetric_encryption::DH_key_exchange::{DH_generate_key_pair,DH_shared_secret,MODP_2048};
         #[test]
         fn generate_key_pair(){
             let (n,e,d) = rsa_generate_key_pair(512, 5);
@@ -26,4 +27,14 @@ mod tests {
 
             assert_eq!(message, decrypted.as_slice());
         }
+        #[test]
+        fn test_DH_key_exchange() {
+            let g = BigUint::from(2u32);
+            let (alice_private , alice_public)  = DH_generate_key_pair(&*MODP_2048, &g);
+            let (bob_private , bob_public)  = DH_generate_key_pair(&*MODP_2048,&g);
+            let alice_shared_secret = DH_shared_secret(&alice_private, &bob_public, &*MODP_2048);
+            let bob_shared_secret = DH_shared_secret(&bob_private, &alice_public, &*MODP_2048);
+            assert_eq!(alice_shared_secret, bob_shared_secret, "Shared secrets should be the same");
+        }
+
 }
