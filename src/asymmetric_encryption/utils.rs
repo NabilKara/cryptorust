@@ -3,13 +3,14 @@ use lazy_static::lazy_static;
 use miller_rabin::is_prime;
 use num_bigint::{BigInt, BigUint, RandBigInt};
 use num_traits::{One, Zero};
- pub fn bigint_gcd(A: &BigUint, B: &BigUint) -> BigUint {
+pub fn bigint_gcd(A: &BigUint, B: &BigUint) -> BigUint {
     if B.is_zero() {
         B.clone()
-    }else {
+    }
+    else {
         bigint_gcd(B, & (A % B))
     }
- }
+}
 fn big_int_extended_gcd(A: BigUint, B: BigUint) -> (BigUint,BigUint, BigUint) {
      if (A.eq(&BigUint::ZERO)) {
         return (B.clone(), BigUint::ZERO, BigUint::one())

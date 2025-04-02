@@ -1,35 +1,19 @@
-use miller_rabin::is_prime;
-use num::Integer;
-use num_bigint::{BigUint, RandBigInt};
+use crate::asymmetric_encryption::utils::{big_int_mod_inverse, bigint_gcd, generate_safe_prime};
+use num_bigint::BigUint;
 use num_traits::One;
-use rand::rngs::OsRng;
-use crate::asymmetric_encryption::utils::{big_int_mod_inverse, bigint_gcd};
-use rand::thread_rng;
 
-fn generate_prime(bits: u64, rounds: usize) -> BigUint {
-    let mut rng = OsRng;
-    loop {
-        let mut candidate = rng.gen_biguint(bits - 1);
-        candidate.set_bit(bits - 1, true);
-        if candidate.is_even(){
-            candidate += BigUint::one();
-        }
-        if is_prime(&candidate, rounds) {
-            return candidate;
-        }
-    }
-}
+const MAX_ATTEMPTS: usize = 100;
+
 pub fn rsa_generate_key_pair(bits: u64, rounds: usize) -> (BigUint, BigUint, BigUint) {
     let e = BigUint::from(65537u32);
-    let mut max_attemps  = 100;
-    let mut attemps = 0;
+    let mut attempts = 0;
     loop {
-        attemps += 1;
-        if attemps > max_attemps {
-            panic!("Failed to generate RSA key pair after {} attemps.", max_attemps);
+        attempts += 1;
+        if attempts > MAX_ATTEMPTS {
+            panic!("Failed to generate RSA key pair after {} attemps.", MAX_ATTEMPTS);
         }
-        let p = generate_prime(bits / 2, rounds);
-        let q = generate_prime(bits / 2, rounds);
+        let p = generate_safe_prime(bits / 2, rounds);
+        let q = generate_safe_prime(bits / 2, rounds);
 
         if (p == q) {
             continue;
@@ -37,7 +21,11 @@ pub fn rsa_generate_key_pair(bits: u64, rounds: usize) -> (BigUint, BigUint, Big
 
         let n = &p * &q;
         let phi = (&p - BigUint::one()) * (&q - BigUint::one());
-
+        println!("p:     {}", p);
+        println!("q:     {}", q);
+        println!("p * q: {}", n);
+        println!("phi:   {}", phi);
+        
         if bigint_gcd(&e, &phi) == BigUint::one() {
             if let Some(d) = big_int_mod_inverse(e.clone(), phi.clone()) {
                 if &d < &n {
