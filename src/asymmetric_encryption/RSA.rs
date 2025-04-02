@@ -1,4 +1,4 @@
-use crate::asymmetric_encryption::utils::{big_int_mod_inverse, bigint_gcd, generate_safe_prime};
+use crate::asymmetric_encryption::utils::{mod_inverse, BigUint_GCD, generate_safe_prime};
 use num_bigint::BigUint;
 use num_traits::One;
 
@@ -10,12 +10,12 @@ pub fn rsa_generate_key_pair(bits: u64, rounds: usize) -> (BigUint, BigUint, Big
     loop {
         attempts += 1;
         if attempts > MAX_ATTEMPTS {
-            panic!("Failed to generate RSA key pair after {} attemps.", MAX_ATTEMPTS);
+            panic!("Failed to generate RSA key pair after {} attempts.", MAX_ATTEMPTS);
         }
         let p = generate_safe_prime(bits / 2, rounds);
         let q = generate_safe_prime(bits / 2, rounds);
 
-        if (p == q) {
+        if p == q {
             continue;
         }
 
@@ -26,8 +26,8 @@ pub fn rsa_generate_key_pair(bits: u64, rounds: usize) -> (BigUint, BigUint, Big
         println!("p * q: {}", n);
         println!("phi:   {}", phi);
         
-        if bigint_gcd(&e, &phi) == BigUint::one() {
-            if let Some(d) = big_int_mod_inverse(e.clone(), phi.clone()) {
+        if BigUint_GCD(e.clone(), phi.clone()) == BigUint::one() {
+            if let Some(d) = mod_inverse(e.clone(), phi.clone()) {
                 if &d < &n {
                     return (n, e, d);
                 }

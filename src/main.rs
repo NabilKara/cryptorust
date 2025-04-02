@@ -42,5 +42,6 @@ fn main() {
     //         }
     //     }
     // }
-    // let (n,e,d) = asymmetric_encryption::RSA::rsa_generate_key_pair(512,1);
+    
+    let (n,e,d) = RSA::rsa_generate_key_pair(512,1);
 }
