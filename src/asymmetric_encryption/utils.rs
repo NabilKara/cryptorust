@@ -2,7 +2,6 @@ use num::Integer;
 use std::cmp::min;
 use std::mem::swap;
 use num_bigint::Sign;
-use lazy_static::lazy_static;
 use miller_rabin::is_prime;
 use num_bigint::{BigInt, BigUint, RandBigInt};
 use num_traits::{One, Zero};
@@ -61,10 +60,6 @@ pub fn extended_gcd(a: BigUint, b: BigUint) -> (BigInt, BigInt, BigInt) {
         (old_t, t) = (t.clone(), old_t - &quotient * t);
     }
 
-    println!("Bézout coefficients: {}, {}", old_s, old_t);
-    println!("Greatest Common Divisor: {}", old_r);
-    println!("Quotient by the GCD: {}, {}", t, s);
-
     (old_r, old_s, old_t)
 }
 
@@ -88,11 +83,6 @@ pub fn mod_inverse(e: BigUint, phi: BigUint) -> Option<BigUint> {
     d_positive.to_biguint()
 }
 
-lazy_static!{
-  pub static ref SECURE_PRIME: BigUint = BigUint::parse_bytes(b"6942120798175882080594457812669318587080243130900436510867221614039874562649870591346956996743843800335323156501717076284789981677900515939965331468577627", 10).unwrap();
-    pub static ref  ANOTHER_SECURE_PRIME: BigUint  = BigUint::parse_bytes(b"13352635493652824167715215077523564732081557266175750779626347670024901835121453931635721885617436238301897405897613394213979133513060312480692170686761343",10).unwrap();
-}
-
 pub fn generate_safe_prime(bit_size: u64, rounds: usize) -> BigUint {
     let max_attempts = match bit_size {
         512 => 500_000,
@@ -102,30 +92,24 @@ pub fn generate_safe_prime(bit_size: u64, rounds: usize) -> BigUint {
         4096 => 100_000_000,
         _ => 10_000_000,
     };
+    
     let mut rng = rand::thread_rng();
-    let mut attempts = 0;
-    loop {
-        if attempts == max_attempts {
-            panic!("failed to generate a safe prime after {} attempts", max_attempts)
-        }
+    for iteration in 1..max_attempts + 1 {
         let mut q = rng.gen_biguint(bit_size - 1);
         q.set_bit(bit_size - 2, true);// Ensure bit length
         q.set_bit(0, true); // Make odd
 
-        if !is_prime(&q, rounds) {
-            attempts += 1;
-            continue;
-        }
+        if !is_prime(&q, rounds) { continue; }
 
         // check if 2q + 1 is prime
         let p = &q * BigUint::from(2u32) + BigUint::one();
 
-        if is_prime(&p, rounds) {
-            return p;
-        }
-        attempts += 1;
-        if attempts % 1000 == 0 {
-            println!("passed {} attempts", attempts);
+        if is_prime(&p, rounds) { return p; }
+        
+        if iteration % 1000 == 0 {
+            println!("passed {} attempts", iteration);
         }
     }
+    
+    panic!("failed to generate a safe prime after {} attempts", max_attempts);
 }

@@ -1,11 +1,12 @@
+
 #[cfg(test)]
 mod tests {
+    use lazy_static::lazy_static;
     use num_bigint::{BigUint, RandBigInt};
     use rand::thread_rng;
     use crate::asymmetric_encryption::RSA::{decrypt, encrypt, rsa_generate_key_pair};
     use crate::asymmetric_encryption::DH_key_exchange::{DH_generate_key_pair,DH_shared_secret,MODP_2048};
     use crate::asymmetric_encryption::ElGamal::{ElGamal_generate_keys, ElGamal_decrypt, ElGamal_encrypt};
-    use crate::asymmetric_encryption::utils::SECURE_PRIME;
 
     #[test]
     fn generate_key_pair(){
@@ -50,6 +51,12 @@ mod tests {
         let bob_shared_secret = DH_shared_secret(&bob_private, &alice_public, &*MODP_2048);
         assert_eq!(alice_shared_secret, bob_shared_secret, "Shared secrets should be the same");
     }
+
+lazy_static!{
+    pub static ref SECURE_PRIME: BigUint = BigUint::parse_bytes(b"6942120798175882080594457812669318587080243130900436510867221614039874562649870591346956996743843800335323156501717076284789981677900515939965331468577627", 10).unwrap();
+    pub static ref ANOTHER_SECURE_PRIME: BigUint  = BigUint::parse_bytes(b"13352635493652824167715215077523564732081557266175750779626347670024901835121453931635721885617436238301897405897613394213979133513060312480692170686761343",10).unwrap();
+}
+
     #[test]
     fn test_elgamal_encryption_decryption() {
         use super::*;

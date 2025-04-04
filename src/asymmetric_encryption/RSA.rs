@@ -4,27 +4,17 @@ use num_traits::One;
 use rand::{thread_rng, Rng};
 
 const MAX_ATTEMPTS: usize = 100;
+
 pub fn rsa_generate_key_pair(bits: u64, rounds: usize) -> (BigUint, BigUint, BigUint) {
     let e = BigUint::from(65537u32);
-    let mut attempts = 0;
-    loop {
-        attempts += 1;
-        if attempts > MAX_ATTEMPTS {
-            panic!("Failed to generate RSA key pair after {} attempts.", MAX_ATTEMPTS);
-        }
+    for _iteration in 1..MAX_ATTEMPTS + 1 {
         let p = generate_safe_prime(bits / 2, rounds);
         let q = generate_safe_prime(bits / 2, rounds);
 
-        if p == q {
-            continue;
-        }
+        if p == q { continue; }
 
         let n = &p * &q;
         let phi = (&p - BigUint::one()) * (&q - BigUint::one());
-        println!("p:     {}", p);
-        println!("q:     {}", q);
-        println!("p * q: {}", n);
-        println!("phi:   {}", phi);
 
         if BigUint_GCD(e.clone(), phi.clone()) == BigUint::one() {
             if let Some(d) = mod_inverse(e.clone(), phi.clone()) {
@@ -34,6 +24,7 @@ pub fn rsa_generate_key_pair(bits: u64, rounds: usize) -> (BigUint, BigUint, Big
             }
         }
     }
+    panic!("Failed to generate RSA key pair after {} attempts.", MAX_ATTEMPTS);
 }
 
 // PKCS#1 v1.5 Padding
@@ -64,33 +55,23 @@ fn pkcs1_v1_5_unpad(padded: &Vec<u8>) -> Vec<u8> {
 }
 
 pub fn encrypt(cleartext: &Vec<u8>, e: &BigUint, n: &BigUint) -> Vec<u8> {
-    println!("M: {:?}", cleartext);
     let k = (n.bits() + 7) / 8; // Key size in bytes
 
     let padded = pkcs1_v1_5_pad(cleartext, k as usize);
-    println!("padded: {:?}", padded);
 
     let m = BigUint::from_bytes_be(padded.as_slice());
-    println!("m: 0x{:X}", m);
 
     if m > *n { panic!("m '0x{m:X}' is bigger than modulus n '0x{n:X}'."); }
     let c = m.modpow(&e, &n);
-    println!("c: 0x{:X}", c);
 
-    println!("c: {:?}", c.to_bytes_be().to_vec());
     c.to_bytes_be().to_vec()
 }
 
 pub fn decrypt(ciphertext: &Vec<u8>, d: &BigUint, n: &BigUint) -> Vec<u8> {
     let mut rslt: Vec<u8> = Vec::new();
-    println!("ciphertext: {:?}", ciphertext);
 
     let c = BigUint::from_bytes_be(ciphertext);
-    println!("c: 0x{:X}", c);
-
     let m = c.modpow(&d, &n);
-    println!("m: 0x{:X}", m);
-
     let m = m.to_bytes_be().to_vec();
 
     // First null byte of padding usually removed by to_bytes_be()

@@ -1,6 +1,5 @@
 use num_bigint::{BigUint, RandBigInt};
 use rand::thread_rng;
-use num_traits::One;
 use crate::asymmetric_encryption::utils::generate_safe_prime;
 pub fn ElGamal_generate_keys(bit_size: u64, rounds : usize) -> (BigUint, BigUint,BigUint, BigUint) {
   let p = generate_safe_prime(bit_size,rounds);
