@@ -1,7 +1,7 @@
-use num::Integer;
 use crate::asymmetric_encryption::utils::{mod_inverse, BigUint_GCD, generate_safe_prime};
 use num_bigint::BigUint;
 use num_traits::One;
+use rand::{thread_rng, Rng};
 
 const MAX_ATTEMPTS: usize = 100;
 pub fn rsa_generate_key_pair(bits: u64, rounds: usize) -> (BigUint, BigUint, BigUint) {
@@ -25,7 +25,7 @@ pub fn rsa_generate_key_pair(bits: u64, rounds: usize) -> (BigUint, BigUint, Big
         println!("q:     {}", q);
         println!("p * q: {}", n);
         println!("phi:   {}", phi);
-        
+
         if BigUint_GCD(e.clone(), phi.clone()) == BigUint::one() {
             if let Some(d) = mod_inverse(e.clone(), phi.clone()) {
                 if &d < &n {
@@ -36,21 +36,53 @@ pub fn rsa_generate_key_pair(bits: u64, rounds: usize) -> (BigUint, BigUint, Big
     }
 }
 
-pub fn encrypt_rsa(cleartext: &Vec<u8>, e: &BigUint, n: &BigUint) -> Vec<u8> {
-    println!("M: {:?}", cleartext);
+// PKCS#1 v1.5 Padding
+fn pkcs1_v1_5_pad(message: &Vec<u8>, k: usize) -> Vec<u8> {
+    let mut rng = thread_rng();
+    let mut padded = vec![0x00, 0x02];
 
-    let m = BigUint::from_bytes_be(cleartext);
+    // Add random non-zero bytes
+    padded.extend((0..k - message.len() - 3).map(|_| rng.gen_range(1..=255)));
+    padded.push(0x00);
+    padded.extend(message);
+    padded
+}
+
+// PKCS#1 v1.5 Unpadding
+fn pkcs1_v1_5_unpad(padded: &Vec<u8>) -> Vec<u8> {
+    if padded.len() < 11 || padded[0] != 0x00 || padded[1] != 0x02 {
+        panic!("Invalid Padding"); // Invalid padding
+    }
+
+    // Find the separator (0x00 after random bytes)
+    let sep_pos = match padded[2..].iter().position(|&b| b == 0x00) {
+        None => panic!("Invalid Padding, couldn't find terminating null byte."),
+        Some(index) => index + 2,   // for 2 bytes that we skipped in search
+    };
+
+    padded[sep_pos + 1..].to_vec()
+}
+
+pub fn encrypt(cleartext: &Vec<u8>, e: &BigUint, n: &BigUint) -> Vec<u8> {
+    println!("M: {:?}", cleartext);
+    let k = (n.bits() + 7) / 8; // Key size in bytes
+
+    let padded = pkcs1_v1_5_pad(cleartext, k as usize);
+    println!("padded: {:?}", padded);
+
+    let m = BigUint::from_bytes_be(padded.as_slice());
     println!("m: 0x{:X}", m);
-    
-    
+
     if m > *n { panic!("m '0x{m:X}' is bigger than modulus n '0x{n:X}'."); }
     let c = m.modpow(&e, &n);
     println!("c: 0x{:X}", c);
 
+    println!("c: {:?}", c.to_bytes_be().to_vec());
     c.to_bytes_be().to_vec()
 }
 
-pub fn decrypt_rsa(ciphertext: &Vec<u8>, d: &BigUint, n: &BigUint) -> Vec<u8> {
+pub fn decrypt(ciphertext: &Vec<u8>, d: &BigUint, n: &BigUint) -> Vec<u8> {
+    let mut rslt: Vec<u8> = Vec::new();
     println!("ciphertext: {:?}", ciphertext);
 
     let c = BigUint::from_bytes_be(ciphertext);
@@ -58,17 +90,12 @@ pub fn decrypt_rsa(ciphertext: &Vec<u8>, d: &BigUint, n: &BigUint) -> Vec<u8> {
 
     let m = c.modpow(&d, &n);
     println!("m: 0x{:X}", m);
-    m.to_bytes_be().to_vec()
-}
-// pub fn encrypt_rsa(message: &[u8], n : &BigUint, e : &BigUint) -> String {
-//     let m  = BigUint::from_bytes_be(message.as_ref());
-//     let c = m.modpow(e,n);
-//     hex::encode(c.to_bytes_be())
-// }
 
-// pub fn decrypt_rsa(ciphertext: &str, n : &BigUint, d : &BigUint) -> Vec<u8> {
-//     let bytes = hex::decode(ciphertext).expect("Invalid hex string");
-//     let c = BigUint::from_bytes_be(&bytes);
-//     let m = c.modpow(d,n);
-//     m.to_bytes_be()
-// }
+    let m = m.to_bytes_be().to_vec();
+
+    // First null byte of padding usually removed by to_bytes_be()
+    if m[0] != 0x00 { rslt.push(0x00); }
+    rslt.extend(m);
+
+    pkcs1_v1_5_unpad(&rslt)
+}
