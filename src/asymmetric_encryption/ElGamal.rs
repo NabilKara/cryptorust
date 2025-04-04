@@ -19,9 +19,8 @@ pub fn ElGamal_encrypt(message : &BigUint, public_key: &BigUint, p : &BigUint, g
   let ciphertext = (message * &masking_public_key) % p;
   (ciphertext, ephemeral_public_key)
 }
-pub fn ElGamal_decrypt(ciphertext: &BigUint, ephemeral_public_key : &BigUint, p : &BigUint, private_key : &BigUint) -> BigUint{
-  let masking_public_key = ephemeral_public_key.modpow(&(p - private_key - BigUint::one()), p);
+pub fn ElGamal_decrypt(ciphertext: &BigUint, ephemeral_public_key: &BigUint, p: &BigUint, private_key: &BigUint) -> BigUint {
+  let masking_public_key = ephemeral_public_key.modpow(private_key, p);
   let inverse_masking_public_key = masking_public_key.modinv(p).unwrap();
-  let decrypted_ciphertext = ciphertext * &inverse_masking_public_key;
-  decrypted_ciphertext
+  (ciphertext * inverse_masking_public_key) % p
 }
