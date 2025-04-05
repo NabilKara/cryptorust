@@ -188,7 +188,7 @@ pub fn main() {
     println!("Decrypted: {}", decrypted);
 }
 
-pub fn Menu(PATH: &mut String) -> u8 {
+pub fn Menu(PATH: &mut String) -> usize {
     let mut buf = String::new();
     let mut key = String::new();
     let r;

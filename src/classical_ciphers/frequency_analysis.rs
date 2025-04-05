@@ -58,14 +58,14 @@ fn printMenu(){
     println!("2- Return");
 }
 
-fn getOption(PATH: String) -> u8 {
+fn getOption(PATH: String) -> usize {
     printMenu();
     let r = super::getInput(PATH, 1, 2);
     println!();
     r
 }
 
-pub fn Menu(PATH: &mut String) -> u8 {
+pub fn Menu(PATH: &mut String) -> usize {
     let mut buf = String::new();
     let decryptions;
     const PREFIX: &str = "frequency_analysis/";

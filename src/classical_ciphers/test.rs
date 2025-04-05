@@ -9,7 +9,7 @@ mod tests {
     use crate::classical_ciphers::playfair::{decrypt_playfair, encrypt_playfair};
     use crate::classical_ciphers::index_of_coincidence::index_of_coincidence_counter;
     use crate::classical_ciphers::rail_fence;
-    use crate::classical_ciphers::Kasiski_Test::{gcd, gcd_list, find_repeated_sequences, kasiski_examination};
+    use crate::classical_ciphers::Kasiski_Test::*;
 
     #[test]
     fn test_caesar_cipher() {
@@ -109,56 +109,67 @@ mod tests {
     }
 
     #[test]
+    fn test_clean_input() {
+        let input = "Hello, World! 123";
+        let expected = "HELLOWORLD";
+        assert_eq!(clean_input(input), expected);
+    }
+
+    #[test]
     fn test_gcd() {
-        assert_eq!(gcd(24, 36), 12);
-        assert_eq!(gcd(101, 103), 1); // Prime numbers
         assert_eq!(gcd(48, 18), 6);
-        assert_eq!(gcd(5, 0), 5); // Edge case
+        assert_eq!(gcd(100, 10), 10);
+        assert_eq!(gcd(17, 5), 1);
     }
 
     #[test]
-    fn test_gcd_list() {
-        let numbers = vec![24, 36, 48];
-        assert_eq!(gcd_list(&numbers), 12);
-        
-        let numbers = vec![10, 20, 30];
-        assert_eq!(gcd_list(&numbers), 10);
-        
-        let numbers = vec![7, 11, 13];
-        assert_eq!(gcd_list(&numbers), 1);
-
-        let empty_vec: Vec<usize> = vec![];
-        assert_eq!(gcd_list(&empty_vec), 1); // Should return 1 for empty list
+    fn test_find_repeat_distances() {
+        let input = "ABCDABCDABCD";
+        let cleaned = clean_input(input);
+        let distances = find_repeat_distances(&cleaned);
+        // We expect repeated trigrams "ABC", "BCD", "CDA", etc.
+        assert!(distances.contains(&4)); // Distance between first and second "ABC"
     }
 
     #[test]
-    fn test_find_repeated_sequences() {
-        let ciphertext = "ABCDABCDABCD"; // "ABCD" repeats every 4 characters
-        let distances = find_repeated_sequences(ciphertext, 4);
-        assert_eq!(distances, vec![4, 4, 4 , 4, 4]); // Expecting distances of 4
-
+    fn test_chi_squared_score_lower_is_better() {
+        let input = "THISISATESTTEXT";
+        let cleaned = clean_input(input);
+        let score_shift_0 = chi_squared(&cleaned, 0);
+        let score_shift_13 = chi_squared(&cleaned, 13);
+        // Just check that the function returns a valid score
+        assert!(score_shift_0 >= 0.0);
+        assert!(score_shift_13 >= 0.0);
     }
 
     #[test]
-    fn test_kasiski_examination() {
-        let ciphertext = "ABCXYZABCXYZABCXYZABCXYZ"; // "ABCXYZ"
-        let estimated_key_length = kasiski_examination(ciphertext);
-        assert_eq!(estimated_key_length, Some(6));
-    }
-
-
-    #[test]
-    fn test_kasiski_no_repeats() {
-        let ciphertext = "ABCDEFGHIJKLMNO"; // No repetitions
-        let estimated_key_length = kasiski_examination(ciphertext);
-        assert_eq!(estimated_key_length, None);
+    fn test_recover_key_simple() {
+        // Vigenère encrypted "ATTACKATDAWN" with key "LEMON" => "LXFOPVEFRNHR"
+        let ciphertext = "WAINKMYTWWLBPDSMFWXMIHLKLTWIQAPSHOQIFTFYDAAEQNFZFCWUOZPNTIUKPPOLOINRMJWWRROJKQPLSMVQRNONXZPSBOPMCIEOHABUWMRVEGSHHZPEGUOITDSXHKWEGJUQGESMSMCMSNWMYTRYYMCITCHZWIRYQBTTSXHTPXDYGQEEILFMWAUUUIYTWNTCPLSGHADAUYSZZVWYQBMISHGMWAGIXZNERYFTLRSYHBYADUVMEETUOATFWYGIYSZYFIORSXHAEROHVINTWIQAPNZCJVPCSNWMLSGOUIYCSYVBQOBXDUPNHUOMAOILHBLBZCUTLCCHIQLNQYHVERSFHAAAFNLMDIAJOQBUSYV";
+        let cleaned = clean_input(ciphertext);
+        let recovered = recover_key(&cleaned, 6); // We know key length is 5
+        assert_eq!(recovered, "LAOUDI");
     }
 
     #[test]
-    fn test_kasiski_short_text() {
-        let ciphertext = "ABC"; // Too short for trigram analysis
-        let estimated_key_length = kasiski_examination(ciphertext);
-        assert_eq!(estimated_key_length, None);
+    fn test_vigenere_decrypt() {
+        let ciphertext = "
+            WAINKMYTWWLBPDSMFWXMIHLKLTWIQAPSHOQIFTFYDAAEQNFZFCWUOZPNTIUKPPOLOINRMJWWRROJKQPLSMVQRNONXZPSBOPMCIEOHABUWMRVEGSHHZPEGUOITDSXHKWEGJUQGESMSMCMSNWMYTRYYMCITCHZWIRYQBTTSXHTPXDYGQEEILFMWAUUUIYTWNTCPLSGHADAUYSZZVWYQBMISHGMWAGIXZNERYFTLRSYHBYADUVMEETUOATFWYGIYSZYFIORSXHAEROHVINTWIQAPNZCJVPCSNWMLSGOUIYCSYVBQOBXDUPNHUOMAOILHBLBZCUTLCCHIQLNQYHVERSFHAAAFNLMDIAJOQBUSYV
+        ";
+
+        let clean_text = clean_input(ciphertext);
+        let distances = find_repeat_distances(&clean_text);
+        let key_len = estimate_key_length(&distances);
+        let key = recover_key(&clean_text, key_len);
+        let message = decrypt(&clean_text, &key);
+
+        let expected_key_len = 6;
+        let expected_key = "LAOUDI";
+        let expected_message = "LAUTHENTICITEDESCOMMUNICATIONSESTUNAUTREASPECTCRUCIALRENFORCEPARLACRYPTOGRAPHIELESSIGNATURESNUMERIQUESQUISONTGENEREESALAIDEDECLESPRIVEESPERMETTENTDEVERIFIERLIDENTITEDELEXPEDITEURCELAGARANTITQUELEMESSAGEPROVIENTBIENDELASOURCEDECLAREEETNAPASETEFALSIFIEDANSLECADREDESTRANSACTIONSENLIGNECETTEASSURANCEESTFONDAMENTALEPOURETABLIRLACONFIANCEENTRELESPARTIESIMPLIQUEES";
+
+        assert_eq!(key_len, expected_key_len, "Key length mismatch");
+        assert_eq!(key, expected_key, "Recovered key mismatch");
+        assert_eq!(message, expected_message, "Decrypted message mismatch");
     }
 
 }

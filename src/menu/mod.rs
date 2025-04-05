@@ -9,19 +9,19 @@ pub fn printGenericMenu(){
     println!("3- Return");
 }
 
-pub fn getGenericOption(PATH: String) -> u8 {
+pub fn getGenericOption(PATH: String) -> usize {
     printGenericMenu();
     let r = getInput(PATH, 1, 3);
     println!();
     r
 }
 
-pub fn getInput(PATH: String, minVal: u8, maxVal: u8) -> u8 {
+pub fn getInput(PATH: String, minVal: usize, maxVal: usize) -> usize {
     loop {
         let mut input: String = String::new();
         print!("{PATH}> ");        io::stdout().flush().unwrap();
         if io::stdin().read_line(&mut input).unwrap() == 1usize { continue; }
-        match input.trim().parse::<u8>() {
+        match input.trim().parse::<usize>() {
             Ok(t) => {
                 if t < minVal || t > maxVal { println!("Invalid Choice."); continue; }
                 return t;

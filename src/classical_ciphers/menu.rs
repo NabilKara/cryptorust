@@ -4,7 +4,7 @@ use crate::classical_ciphers::frequency_analysis::Menu as FrequencyAnalysisMenu;
 use crate::classical_ciphers::rail_fence::Menu as RailFenceMenu;
 use crate::classical_ciphers::playfair::Menu as PlayfairMenu;
 use crate::classical_ciphers::affine_cipher::Menu as AffineMenu;
-const RETURN_STATUS: u8 = 0;
+const RETURN_STATUS: usize = 0;
 
 const options: [&str; 7] = [
     "1- Caesar Cipher",
@@ -28,7 +28,7 @@ pub fn Menu(PATH: &mut String){
     PATH.push_str(PREFIX);
     loop {
         printMenu();
-        let mut r = super::getInput(PATH.clone(), 1, options.len() as u8);
+        let mut r = super::getInput(PATH.clone(), 1, options.len());
         print!("{esc}[2J{esc}[1;1H", esc = 27 as char);
         r = match r {
             1 => CaesarMenu(PATH),
