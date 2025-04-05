@@ -4,6 +4,7 @@
 mod classical_ciphers;
 mod menu;
 mod symmetric_encryption;
+mod asymmetric_encryption;
 
 const options: [&str; 5] = [
     "Ciphers",
@@ -22,7 +23,6 @@ fn printMenu(){
 fn main() {
     print!("{esc}[2J{esc}[1;1H", esc = 27 as char);
     loop {
-
         let mut PATH = String::from("/");
         printMenu();
         let r = menu::getInput(PATH.clone(), 1, options.len());

@@ -2,10 +2,10 @@ use rand::Rng;
 use crate::classical_ciphers::vigenere::{decrypt_vigenere, encrypt_vigenere};
 
 pub fn generate_otp_key(length: usize) -> String{
-    let mut rng = rand::rng();
+    let mut rng = rand::thread_rng();
     (0..length)
         .map(|_| {
-            (b'A' + rng.random_range(0..26)) as char
+            (b'A' + rng.gen_range(0..26)) as char
         })
         .collect()
 }

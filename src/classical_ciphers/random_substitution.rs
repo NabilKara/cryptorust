@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use rand::seq::SliceRandom;
 pub fn generate_random_substitution_key() -> HashMap<char,char>{
-    let mut rng = rand::rng();
+    let mut rng = rand::thread_rng();
     let alphabet: Vec<char> = ('a'..='z').collect();
     let mut shuffled = alphabet.clone();
     shuffled.shuffle(&mut rng);
