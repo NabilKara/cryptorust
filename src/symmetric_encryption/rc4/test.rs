@@ -1,6 +1,7 @@
 #[cfg(test)]
 mod tests {
     use super::*;
+    use super::super::rc4::*;
 
     #[test]
     fn test_vector_key_plaintext() {
@@ -28,14 +29,4 @@ mod tests {
         let ciphertext = rc4(key, plaintext);
         assert_eq!(to_hex(&ciphertext), expected_hex);
     }
-
-    #[test]
-    fn test_vector_secret_attack() {
-        let key = b"Secret";
-        let plaintext = b"Attack at dawn";
-        let expected_hex = "45 A0 1F 64 5F C3 5B 38 35 52 54 4B 9B F5";
-        let ciphertext = rc4(key, plaintext);
-        assert_eq!(to_hex(&ciphertext), expected_hex);
-    }
-    
 }

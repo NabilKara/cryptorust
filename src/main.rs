@@ -30,6 +30,7 @@ fn main() {
         match r {
             1 => classical_ciphers::menu::Menu(&mut PATH),
             2 => symmetric_encryption::menu::Menu(&mut PATH),
+            3 => asymmetric_encryption::menu::Menu(&mut PATH),
             5 => {
                 println!("Good Bye !! ");
                 break;
