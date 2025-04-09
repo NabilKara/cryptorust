@@ -1,6 +1,6 @@
 use std::io::{self, Write};
 use crate::symmetric_encryption::rc4::{encrypt::encrypt, decrypt::decrypt, rc4::to_hex};
-use super::super::menu::{outputBytes, parseBytes};
+use super::super::menu::{outputBytes, parseHexBytes};
 
 fn print_rc4_menu() {
     println!("Choose operation:");
@@ -27,12 +27,12 @@ pub fn Menu(path: &mut String) -> usize {
     print!("Enter data as series of hex (e.g., 48656C6C6F): ");
     io::stdout().flush().unwrap();
     io::stdin().read_line(&mut data_input).expect("Failed to read input");
-    let data = parseBytes(data_input);
+    let data = parseHexBytes(data_input);
 
     print!("Enter key as series of hex (e.g., 6B6579): ");
     io::stdout().flush().unwrap();
     io::stdin().read_line(&mut key_input).expect("Failed to read key");
-    let key = parseBytes(key_input);
+    let key = parseHexBytes(key_input);
 
     let result = match choice {
         1 => encrypt(&key, &data),

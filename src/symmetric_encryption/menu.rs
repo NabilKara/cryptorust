@@ -26,6 +26,7 @@ pub fn Menu(PATH: &mut String){
         r = match r {
             1 => super::aes::menu::Menu(PATH),
             2 => super::des::menu::Menu(PATH),
+            3 => super::rc4::menu::Menu(PATH),
             _ => return
         };
 
