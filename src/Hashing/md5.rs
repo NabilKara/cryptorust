@@ -1,5 +1,3 @@
-use std::io::{self, Read};
-
 pub(crate) fn md5(input: &str) -> String {
     let mut message = input.as_bytes().to_vec();
     let bit_len = (message.len() as u64) * 8;

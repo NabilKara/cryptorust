@@ -6,11 +6,13 @@ mod menu;
 mod symmetric_encryption;
 mod asymmetric_encryption;
 mod Hashing;
+mod secureChannel;
 
-const options: [&str; 5] = [
+const options: [&str; 6] = [
     "Ciphers",
     "Symmetric Encryption Systems",
     "Asymmetric Encryption Systems",
+    "Secure Communication Channel",
     "Help",
     "Quit",
 ];
@@ -19,7 +21,6 @@ fn printMenu(){
     println!("PLease choose an option:");
     for i in 0..options.len(){ println!("{}- {} ", i + 1, options[i]); }
 }
-
 
 fn main() {
     print!("{esc}[2J{esc}[1;1H", esc = 27 as char);
@@ -31,7 +32,8 @@ fn main() {
         match r {
             1 => classical_ciphers::menu::Menu(&mut PATH),
             2 => symmetric_encryption::menu::Menu(&mut PATH),
-            5 => {
+            4 => secureChannel::menu::Menu(&mut PATH),
+            6 => {
                 println!("Good Bye !! ");
                 break;
             },
