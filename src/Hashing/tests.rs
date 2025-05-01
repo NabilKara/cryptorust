@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod tests {
-    use super::md5::md5;
+    use super::super::md5::md5;
 
     #[test]
     fn test_md5_known_vectors() {

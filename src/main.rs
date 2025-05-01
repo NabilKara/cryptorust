@@ -5,6 +5,7 @@ mod classical_ciphers;
 mod menu;
 mod symmetric_encryption;
 mod asymmetric_encryption;
+mod Hashing;
 
 const options: [&str; 5] = [
     "Ciphers",
