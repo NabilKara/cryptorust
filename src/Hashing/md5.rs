@@ -1,16 +1,9 @@
 use std::io::{self, Read};
 
-fn main() {
-
-    let hash = md5("The quick brown fox jumps over the lazy dog".trim_end()); // trim newline if any
-    println!("MD5: {}", hash);
-}
-
 fn md5(input: &str) -> String {
     let mut message = input.as_bytes().to_vec();
     let bit_len = (message.len() as u64) * 8;
 
-    // Padding
     message.push(0x80);
     while (message.len() % 64) != 56 {
         message.push(0);
