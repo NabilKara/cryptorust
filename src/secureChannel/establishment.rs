@@ -40,5 +40,7 @@ pub fn setupConnection_host(stream: &mut TcpStream, aes_key: &[u8; 16]) {
 
     // Send encrypted AES key to server
     write_biguint(stream, &ciphertext).expect("Failed to send ciphertext");
+    println!("Sent ciphertext: {:?}", ciphertext.to_bytes_be());
     write_biguint(stream, &ephemeral_pk).expect("Failed to send ephemeral_pk");
+    println!("Sent ephemeral_pk: {:?}", ephemeral_pk.to_bytes_be());
 }
