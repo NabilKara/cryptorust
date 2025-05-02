@@ -2,7 +2,6 @@ use std::net::TcpStream;
 use num_bigint::BigUint;
 use crate::asymmetric_encryption::ElGamal::{ElGamal_decrypt, ElGamal_encrypt, ElGamal_generate_keys};
 use super::util::*;
-use super::chat::*;
 
 pub fn setupSession_connector(stream: &mut TcpStream) -> [u8; 16] {
     let (pub_key, prv_key, p, g) = ElGamal_generate_keys(256, 10);

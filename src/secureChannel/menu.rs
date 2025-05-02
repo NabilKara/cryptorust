@@ -3,7 +3,6 @@ use std::io::Write;
 use std::net::{Ipv4Addr, SocketAddrV4, TcpListener, TcpStream};
 use std::str::FromStr;
 use rand::random;
-use crate::asymmetric_encryption::ElGamal::{ElGamal_decrypt, ElGamal_encrypt, ElGamal_generate_keys};
 use super::establishment::*;
 use super::util::*;
 use super::chat::*;
@@ -40,6 +39,29 @@ pub fn Menu(PATH: &mut String){
     return;
 }
 
+pub fn Host() {
+    let listener = TcpListener::bind(("127.0.0.1", PROTOCOL_PORT)).expect("Failed to bind port");
+    println!("Server listening on  {}:{}...", listener.local_addr().unwrap().ip(), listener.local_addr().unwrap().port());
+
+    // Generate a random AES key (32 bytes for AES-256)
+    let aes_key = random::<[u8; 16]>();
+    let mut peer = None;
+
+    for stream in listener.incoming(){
+        match stream {
+            Ok(mut stream) => {
+                println!("New connection: {:?}...", stream);
+                setupConnection_host(&mut stream, &aes_key);
+                peer = Some(stream);
+                break;
+            }
+            Err(e) => eprintln!("Error: {}", e)
+        }
+    };
+
+    chat_loop(peer.expect("Lost Connection After it has been established."), aes_key, true);
+}
+
 fn Connect() {
     let mut addr = String::new();
     print!("Enter IPv4 Address: ");               io::stdout().flush().unwrap();
@@ -62,28 +84,5 @@ fn Connect() {
         Err(e) => panic!("\nError Connecting to {sock}: {e}")
     };
 
-    start_chat(peer, aes_key, false);
-}
-
-pub fn Host() {
-    let listener = TcpListener::bind(("127.0.0.1", PROTOCOL_PORT)).expect("Failed to bind port");
-    println!("Server listening on  {}:{}...", listener.local_addr().unwrap().ip(), listener.local_addr().unwrap().port());
-
-    // Generate a random AES key (32 bytes for AES-256)
-    let aes_key = random::<[u8; 16]>();
-    let mut peer = None;
-
-    for stream in listener.incoming(){
-        match stream {
-            Ok(mut stream) => {
-                println!("New connection from {:?}...", stream);
-                crate::secureChannel::establishment::setupConnection_host(&mut stream, &aes_key);
-                peer = Some(stream);
-                break;
-            }
-            Err(e) => eprintln!("Error: {}", e)
-        }
-    };
-
-    start_chat(peer.expect("Lost Connection After it has been established."), aes_key, true);
+    chat_loop(peer, aes_key, false);
 }
