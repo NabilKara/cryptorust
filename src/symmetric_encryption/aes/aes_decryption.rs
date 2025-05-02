@@ -62,6 +62,7 @@ pub fn inv_mix_columns(state: &mut [u8; 16]) {
 }
 
 pub fn decrypt_cbc(ciphertext: Vec<u8>, iv : &[u8; 16], key: &[u8; 16]) -> Result<Vec<u8>, &'static str> {
+    let block_size: usize = 16;
     if ciphertext.len() < 16 {
         return Err("ciphertext is too short");
     }
@@ -82,7 +83,9 @@ pub fn decrypt_cbc(ciphertext: Vec<u8>, iv : &[u8; 16], key: &[u8; 16]) -> Resul
             plaintext.push(b);
         }
     }
-    Ok(plaintext)
+    // Ok(plaintext)
+    Ok(remove_pad_pkcs7(&mut plaintext, block_size).expect("Failed to remove pad pkcs7"))
+
 }
 
 pub fn decrypt_ecb(ciphertext: &Vec<u8>, key: &[u8; 16]) -> Result<Vec<u8>, &'static str> {

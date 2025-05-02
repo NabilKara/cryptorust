@@ -50,7 +50,7 @@ pub fn Host() {
     for stream in listener.incoming(){
         match stream {
             Ok(mut stream) => {
-                println!("New connection: {:?}...", stream);
+                println!("New connection from {}:{}...", stream.peer_addr().unwrap().ip(), stream.peer_addr().unwrap().port());
                 setupConnection_host(&mut stream, &aes_key);
                 peer = Some(stream);
                 break;
@@ -74,12 +74,15 @@ fn Connect() {
 
     let aes_key;
     let peer;
-    print!("Connecting to {}:{}...", sock.ip(), sock.port());  io::stdout().flush().unwrap();  // Force flush
+    print!("Connecting to {}:{}... ", sock.ip(), sock.port());  io::stdout().flush().unwrap();  // Force flush
     match TcpStream::connect(sock) {
         Ok(mut stream) => {
+            println!("Done.");
+
+            print!("Generating ElGamal key pair... ");      io::stdout().flush().unwrap();  // Force flush
             aes_key = setupSession_connector(&mut stream);
             peer = stream;
-            println!(" Done.");
+            println!("Done.");
         },
         Err(e) => panic!("\nError Connecting to {sock}: {e}")
     };
