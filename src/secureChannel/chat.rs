@@ -1,6 +1,6 @@
 use std::io::{self, Read, Write};
 use std::net::TcpStream;
-use std::thread;
+use std::{fmt, thread};
 use num_bigint::BigUint;
 use num_traits::Zero;
 use rand::random;
@@ -10,6 +10,7 @@ use crate::symmetric_encryption::aes::aes_encryption::encrypt_cbc as AES_CBC_Enc
 use crate::symmetric_encryption::aes::aes_decryption::decrypt_cbc as AES_CBC_Decrypt;
 use crate::asymmetric_encryption::RSA::encrypt as RSA_Encrypt;
 use crate::asymmetric_encryption::RSA::decrypt as RSA_Decrypt;
+use sha2::{Sha256, Digest};
 
 const IV_SIZE: usize = 16;                  // AES-128 IV
 
@@ -29,7 +30,7 @@ struct RSA_KEY {
     n: BigUint,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 struct Message {
     IV: [u8; 16],
     Data: Vec<u8>,
@@ -39,14 +40,34 @@ struct Message {
     Delimiter: [u8; DELIMITER_SIZE],
 }
 
+impl fmt::Debug for Message {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        writeln!(f, "Message {{")?;
+        writeln!(f, "\tIV       : {:?}", self.IV)?;
+        writeln!(f, "\tData     : {:?}", self.Data)?;
+        writeln!(f, "\tSeparator: {:?}", self.Separator)?;
+
+        writeln!(f, "\tSignature: {:?}", self.Signature)?;
+        writeln!(f, "\tHash     : {:?}", self.Hash)?;
+        writeln!(f, "\tDelimiter: {:?}", self.Delimiter)?;
+        writeln!(f, "}}")
+    }
+}
+
 impl Message {
     fn new(data: &Vec<u8>, aes_key: &[u8; 16], rsa_key: &RSA_KEY) -> Message {
         let iv: [u8; 16] = random::<[u8; 16]>();
         let encrypted_data = AES_CBC_Encrypt(data, &iv, &aes_key);
+
+        // Payload to Hash
         let mut payload = iv.clone().to_vec();
         payload.extend(&iv);
 
-        let hash = [0x90u8; HASH_SIZE];
+        // Compute SHA2-256 hash of the payload
+        let mut hasher = Sha256::new();
+        hasher.update(&payload);
+        let hash: [u8; HASH_SIZE] = hasher.finalize_reset().into();
+
         let signature = RSA_Encrypt(&hash.to_vec(), &rsa_key.d, &rsa_key.n);
 
         Message {
@@ -70,7 +91,7 @@ impl Message {
         output
     }
 
-    fn fromBytes(data: &[u8], rsa_key: RSA_KEY) -> io::Result<Message> {
+    fn fromBytes(data: &[u8], rsa_key: &RSA_KEY) -> io::Result<Message> {
         if data.len() < PACKET_MIN_SIZE { panic!("Message too small to contain base structure."); }
 
         let delimiter_index = match data.windows(DELIMITER_SIZE).position(|window| window == FRAME_DELIMITER) {
@@ -90,8 +111,23 @@ impl Message {
         let hash: [u8; HASH_SIZE]            =  data[delimiter_index - HASH_SIZE..delimiter_index].try_into().unwrap();
         let delimiter: [u8; DELIMITER_SIZE]  =  data[delimiter_index..delimiter_index + DELIMITER_SIZE].try_into().unwrap();
 
+        // Payload to Hash
+        let mut payload = iv.clone().to_vec();
+        payload.extend(&iv);
+
+        // Compute SHA2-256 hash of the payload
+        let mut hasher = Sha256::new();
+        hasher.update(&payload);
+        let expected_hash: [u8; HASH_SIZE] = hasher.finalize_reset().into();
+    
+        if expected_hash != hash {
+            panic!("Hash mismatch.\nExpected: {:?}\nActual:   {:?}", expected_hash, hash);
+        }
+
         let signature = RSA_Decrypt(&signature, &rsa_key.e, &rsa_key.n);
-        if !cmp_vec(&hash.to_vec(), &signature) { panic!("Signature Hash Mismatch."); }
+        if !cmp_vec(&hash.to_vec(), &signature) { 
+            panic!("Signature Mismatch.\nExpected: {:?}\nGo:       {:?}", hash.to_vec(), signature.to_vec());
+        }
         
         Ok(Message {
             IV: iv,
@@ -112,7 +148,6 @@ impl Message {
 }
 
 pub fn chat_loop(stream: TcpStream, key: [u8; 16], is_server: bool) {
-
     print!("Generating RSA Key pair... ");          io::stdout().flush().unwrap();
     let (local_mod, local_pub, local_prv) = rsa_generate_key_pair(512, 5);
     let local_rsa = RSA_KEY {
@@ -165,12 +200,12 @@ pub fn chat_loop(stream: TcpStream, key: [u8; 16], is_server: bool) {
             match recv_stream.read(&mut buffer) {
                 Ok(n) if n > 0 => {
                     print!("\x1B[2K\r"); // Clear current line
-                    let msg = Message::fromBytes(&buffer).expect("Invalid Message.");
+                    let msg = Message::fromBytes(&buffer, &peer_rsa).expect("Invalid Message.");
 
-                    println!("Received: {:?}", msg);
+                    print!("Received: {:?}", msg);
 
-                    println!("Text before Decrypting: {:?}", msg.Data);
-                    println!("Text  after Decrypting: {:?}", msg.getClearText(&key));
+                    // println!("Text before Decrypting: {:?}", msg.Data);
+                    // println!("Text  after Decrypting: {:?}", msg.getClearText(&key));
 
                     let cleartext = msg.getClearText(&key);
                     let cleartext = String::from_utf8_lossy(cleartext.as_slice());
@@ -214,8 +249,8 @@ pub fn chat_loop(stream: TcpStream, key: [u8; 16], is_server: bool) {
                 input.push(0 as char); // For termination
                 let message = Message::new(&input.clone().into_bytes(), &key, &local_rsa);
 
-                println!("Sending {:?}...", message);
-                println!("Sending {:?}...", message.clone().toBytes().as_slice());
+                print!("Sending {:?}", message);
+                // println!("Sending {:?}...", message.clone().toBytes().as_slice());
 
                 if send_stream.write_all(message.toBytes().as_slice()).is_err() {
                     eprintln!("Failed to send message");
