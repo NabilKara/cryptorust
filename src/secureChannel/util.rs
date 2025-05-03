@@ -1,8 +1,8 @@
+// A File containing helper functions
+
 use std::io;
 use std::io::{Read, Write};
 use num_bigint::BigUint;
-
-pub const PROTOCOL_PORT: u16 = 42069;
 
 pub fn write_biguint(writer: &mut impl Write, num: &BigUint) -> io::Result<()> {
     let bytes = num.to_bytes_be();

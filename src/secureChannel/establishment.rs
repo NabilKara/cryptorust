@@ -48,6 +48,7 @@ pub fn setupConnection_host(stream: &mut TcpStream, _aes_key: &[u8; 16]) {
     print!("Sending AES Key... ");                          io::stdout().flush().unwrap();
     // Encrypt the AES key with client's public key
     let (ciphertext, ephemeral_pk) = ElGamal_encrypt(&aes_key, &pub_key, &p, &g);
+    
     // Send encrypted AES key to server
     write_biguint(stream, &ciphertext).expect("Failed to send ciphertext");
     // println!("Sent ciphertext: {:?}", ciphertext.to_bytes_be());

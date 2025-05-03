@@ -4,7 +4,7 @@ use std::net::{Ipv4Addr, SocketAddrV4, TcpListener, TcpStream};
 use std::str::FromStr;
 use rand::random;
 use super::establishment::*;
-use super::util::*;
+use super::base::PROTOCOL_PORT;
 use super::chat::*;
 
 const options: [&str; 3] = [
@@ -51,6 +51,7 @@ pub fn Host() {
     for stream in listener.incoming(){
         match stream {
             Ok(mut stream) => {
+                print!("{esc}[2J{esc}[1;1H", esc = 27 as char);
                 println!("New connection from {}:{}...", stream.peer_addr().unwrap().ip(), stream.peer_addr().unwrap().port());
                 setupConnection_host(&mut stream, &aes_key);
                 peer = Some(stream);
@@ -60,7 +61,7 @@ pub fn Host() {
         }
     };
 
-    chat_loop(peer.expect("Lost Connection After it has been established."), aes_key, true);
+    chat_loop(peer.expect("Lost Connection After it has been established."), aes_key);
 }
 
 fn Connect() {
@@ -73,6 +74,7 @@ fn Connect() {
     let sock = SocketAddrV4::from_str(format!("{addr}:{PROTOCOL_PORT}").as_str())
         .expect(format!("Invalid socket address '{addr}'").as_str());
 
+    print!("{esc}[2J{esc}[1;1H", esc = 27 as char);
     let aes_key;
     let peer;
     print!("Connecting to {}:{}... ", sock.ip(), sock.port());  io::stdout().flush().unwrap();  // Force flush
@@ -85,5 +87,5 @@ fn Connect() {
         Err(e) => panic!("\nError Connecting to {sock}: {e}")
     };
 
-    chat_loop(peer, aes_key, false);
+    chat_loop(peer, aes_key);
 }
