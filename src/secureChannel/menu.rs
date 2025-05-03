@@ -78,11 +78,8 @@ fn Connect() {
     match TcpStream::connect(sock) {
         Ok(mut stream) => {
             println!("Done.");
-
-            print!("Generating ElGamal key pair... ");      io::stdout().flush().unwrap();  // Force flush
             aes_key = setupSession_connector(&mut stream);
             peer = stream;
-            println!("Done.");
         },
         Err(e) => panic!("\nError Connecting to {sock}: {e}")
     };

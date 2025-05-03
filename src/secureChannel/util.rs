@@ -19,3 +19,13 @@ pub fn read_biguint(reader: &mut impl Read) -> io::Result<BigUint> {
     reader.read_exact(&mut buf)?;
     Ok(BigUint::from_bytes_be(&buf))
 }
+
+pub fn cmp_vec<T: PartialEq>(A: &Vec<T>, b: &Vec<T>) -> bool {
+    if A.len() != b.len() { return false; }
+    for (a, b) in A.iter().zip(b.iter()) {
+        if a != b {
+            return false;
+        }
+    }
+    true
+}

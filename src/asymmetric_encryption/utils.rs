@@ -94,7 +94,7 @@ pub fn generate_safe_prime(bit_size: u64, rounds: usize) -> BigUint {
     };
     
     let mut rng = rand::thread_rng();
-    for iteration in 1..max_attempts + 1 {
+    for _iteration in 1..max_attempts + 1 {
         let mut q = rng.gen_biguint(bit_size - 1);
         q.set_bit(bit_size - 2, true);// Ensure bit length
         q.set_bit(0, true); // Make odd
@@ -106,9 +106,9 @@ pub fn generate_safe_prime(bit_size: u64, rounds: usize) -> BigUint {
 
         if is_prime(&p, rounds) { return p; }
         
-        if iteration % 1000 == 0 {
-            println!("passed {} attempts", iteration);
-        }
+        // if iteration % 1000 == 0 {
+        //     println!("passed {} attempts", iteration);
+        // }
     }
     
     panic!("failed to generate a safe prime after {} attempts", max_attempts);
