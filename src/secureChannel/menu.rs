@@ -40,7 +40,7 @@ pub fn Menu(PATH: &mut String){
 }
 
 pub fn Host() {
-    let listener = TcpListener::bind(("127.0.0.1", PROTOCOL_PORT)).expect("Failed to bind port");
+    let listener = TcpListener::bind(("0.0.0.0", PROTOCOL_PORT)).expect("Failed to bind port");
     print!("Server listening on  {}:{}...", listener.local_addr().unwrap().ip(), listener.local_addr().unwrap().port());
     io::stdout().flush().unwrap();  // Force flush
     
