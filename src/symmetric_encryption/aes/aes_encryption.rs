@@ -105,7 +105,7 @@ pub fn encrypt_ecb(plaintext: Vec<u8>, key: &[u8; 16]) -> Vec<u8> {
     output
 }
 
-pub fn encrypt_cbc(plaintext: &Vec<u8>, iv : &[u8; 16] ,key: &[u8; 16]) -> Vec<u8> {
+pub fn encrypt_cbc(plaintext: &Vec<u8>, iv : &[u8; 16], key: &[u8; 16]) -> Vec<u8> {
     let block_size: usize = 16;
     let padded_plaintext = pad_pkcs7(plaintext, block_size);
     let mut ciphertext : Vec<u8> = Vec::new();
