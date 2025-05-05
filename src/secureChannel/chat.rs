@@ -42,18 +42,20 @@ pub fn chat_loop(stream: TcpStream, key: [u8; 16]) {
         d: BigUint::zero()
     };
     println!("Done.");
-
-    // Basic RSA Logging
-    println!("\nLocal RSA Credentials:");
-    println!("\tModulus    : {}", local_rsa.n);
-    println!("\tPublic Key : {}", local_rsa.e);
-    println!("\tPrivate Key: {}", local_rsa.d);
-
-    println!("Peer RSA Credentials:");
-    println!("\tModulus   : {}", peer_rsa.n);
-    println!("\tPublic Key: {}", peer_rsa.e);
     
-    println!("You can Exit By Typing '{}'.\n", EXIT_MESSAGE);
+    // TRY A SHARED OBJECT FILE SOLUTION, BETWEEN RECEIVER AND SENDER THREADS, NEED TO VERIFY COMPATIBILITY WITH WINDOWS, AS I ONLY HEARD OF SHARED OBJECT FILES IN LINUX
+    
+    // Basic RSA Logging
+    println!("\n* Local RSA Credentials:");
+    println!("\t- Modulus    : {}", local_rsa.n);
+    println!("\t- Public Key : {}", local_rsa.e);
+    println!("\t- Private Key: {}", local_rsa.d);
+
+    println!("* Peer RSA Credentials:");
+    println!("\t- Modulus   : {}", peer_rsa.n);
+    println!("\t- Public Key: {}", peer_rsa.e);
+    
+    println!("\nYou can Exit By Typing '{}'.\n", EXIT_MESSAGE);
 
     // Spawn receiver thread
     thread::spawn(move || {
@@ -64,7 +66,8 @@ pub fn chat_loop(stream: TcpStream, key: [u8; 16]) {
                 Ok(n) if n > 0 => {
                     print!("\x1B[2K\r"); // Clear current line
                     let msg = Message::fromBytes(&buffer, &peer_rsa).expect("Invalid Message.");
-
+                    
+                    // FOR DEBUGGING PURPOSES
                     // println!("Text before Decrypting: {:?}", msg.Data);
                     // println!("Text  after Decrypting: {:?}", msg.getClearText(&key));
 

@@ -21,7 +21,7 @@ fn printMenu(){
 }
 
 pub fn Menu(PATH: &mut String){
-    const PREFIX: &str = "channel/";
+    const PREFIX: &str = "secure_channel/";
 
     PATH.push_str(PREFIX);
     // loop {
@@ -44,7 +44,7 @@ pub fn Host() {
     print!("Server listening on  {}:{}...", listener.local_addr().unwrap().ip(), listener.local_addr().unwrap().port());
     io::stdout().flush().unwrap();  // Force flush
     
-    // Generate a random AES key (32 bytes for AES-256)
+    // Generate a random AES key (16 bytes for AES-128)
     let aes_key = random::<[u8; 16]>();
     let mut peer = None;
 
