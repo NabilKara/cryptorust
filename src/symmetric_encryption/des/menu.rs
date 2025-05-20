@@ -2,7 +2,7 @@ use std::io;
 use std::io::Write;
 use crate::symmetric_encryption::des::encrypt::{encryptCBC, encryptECB};
 use crate::symmetric_encryption::des::decrypt::{decryptCBC, decryptECB};
-use super::super::menu::{outputBytes, parseBytes};
+use super::super::menu::{outputBytes, parseHexBytes};
 
 fn printModesMenu(){
     println!("Choose mode:");
@@ -36,11 +36,11 @@ pub fn Menu(PATH: &mut String) -> usize {
 
     print!("Enter text as series of hex (ABCDE12...): ");               io::stdout().flush().unwrap();
     io::stdin().read_line(&mut buf).expect("Failed to read plaintext");
-    let buf = parseBytes(buf);
+    let buf = parseHexBytes(buf);
 
     print!("Enter key as series of hex (ABCDE12...): ");                  io::stdout().flush().unwrap();
     io::stdin().read_line(&mut key).expect("Failed to read key");
-    let key: [u8; 8] = match parseBytes(key).try_into() {
+    let key: [u8; 8] = match parseHexBytes(key).try_into() {
         Ok(k) => k,
         Err(t) => panic!("Key length must be 8 bytes but got '{}'.", t.len()),
     };
@@ -48,7 +48,7 @@ pub fn Menu(PATH: &mut String) -> usize {
     if m == 2 {
         print!("Enter IV as series of hex (ABCDE12...): ");               io::stdout().flush().unwrap();
         io::stdin().read_line(&mut iv).expect("Failed to read plaintext");
-        iv_arr = match parseBytes(iv).try_into() {
+        iv_arr = match parseHexBytes(iv).try_into() {
             Ok(k) => k,
             Err(t) => panic!("IV length must be 8 bytes but got '{}'.", t.len()),
         };

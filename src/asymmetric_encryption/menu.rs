@@ -1,11 +1,11 @@
-pub(crate) use super::{parseHexBytes, outputBytes};
+use super::RSA::Menu as RSAMenu;
 
 const RETURN_STATUS: usize = 0;
 
 const options: [&str; 4] = [
-    "1- AES",
-    "2- DES",
-    "3- RC4",
+    "1- RSA",
+    "2- ElGamal",
+    "3- Diffie–Hellman key exchange",
     "4- Return"
 ];
 
@@ -17,16 +17,15 @@ pub(crate) fn printMenu(){
 }
 
 pub fn Menu(PATH: &mut String){
-    const PREFIX: &str = "symmetric_encryption/";
+    const PREFIX: &str = "asymmetric_encryption/";
     PATH.push_str(PREFIX);
     loop {
         printMenu();
         let mut r = super::getInput(PATH.clone(), 1, options.len());
         print!("{esc}[2J{esc}[1;1H", esc = 27 as char);
-        r = match r {
-            1 => super::aes::menu::Menu(PATH),
-            2 => super::des::menu::Menu(PATH),
-            3 => super::rc4::menu::Menu(PATH),
+        r = match r {   
+            1 => RSAMenu(PATH),
+            2 => todo!(),
             _ => return
         };
 
