@@ -86,9 +86,10 @@ pub fn elgamal_menu(PATH: &mut String) -> usize {
             vec![c1.to_bytes_be(), c2.to_bytes_be()].concat()
         },
         2 => {
+            let message = message.to_bytes_be();
             // For decryption, we need to split input into two components
-            let half = message.to_bytes_be().len() / 2;
-            let (c1_bytes, c2_bytes) = message.to_bytes_be().split_at(half);
+            let half = message.len() / 2;
+            let (c1_bytes, c2_bytes) = message.split_at(half);
             let c1 = BigUint::from_bytes_be(c1_bytes);
             let c2 = BigUint::from_bytes_be(c2_bytes);
 
