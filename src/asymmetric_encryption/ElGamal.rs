@@ -28,7 +28,7 @@ pub fn ElGamal_decrypt(ciphertext: &BigUint, ephemeral_public_key: &BigUint, p: 
     (ciphertext * inverse_masking_public_key) % p
 }
 
-pub fn elgamal_menu(PATH: &mut String) -> usize {
+pub fn Menu(PATH: &mut String) -> usize {
     let mut buf = String::new();
     let mut p_str = String::new();
     let mut g_str = String::new();

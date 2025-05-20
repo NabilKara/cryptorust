@@ -1,12 +1,12 @@
 use super::RSA::Menu as RSAMenu;
+use super::ElGamal::Menu as ElGamalMenu;
 
 const RETURN_STATUS: usize = 0;
 
-const options: [&str; 4] = [
+const options: [&str; 3] = [
     "1- RSA",
     "2- ElGamal",
-    "3- Diffie–Hellman key exchange",
-    "4- Return"
+    "3- Return"
 ];
 
 pub(crate) fn printMenu(){
@@ -25,7 +25,7 @@ pub fn Menu(PATH: &mut String){
         print!("{esc}[2J{esc}[1;1H", esc = 27 as char);
         r = match r {   
             1 => RSAMenu(PATH),
-            2 => todo!(),
+            2 => ElGamalMenu(PATH),
             _ => return
         };
 
